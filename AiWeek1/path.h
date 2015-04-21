@@ -7,7 +7,7 @@
 typedef struct Path {
   int length;   /* length of the path */
   int free;     /* number of available positions (until realloc) */
-  Position *positions;
+	Position *positions;
 } Path;
 
 /* initialize path (make empty path) */

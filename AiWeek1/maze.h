@@ -44,10 +44,10 @@ int isSolved(Maze maze);
 /* make a move in the specified direction. Returns true(1) if
  * this is indeed possible, false(0) otherwise.
  */
-int makeMove(Maze *maze, Direction dir);
+ int makeMove(Maze *maze, Direction dir);
 
 /* returns the cost of the path travelled from the initial position
  * to the current location */
-int getCost(Maze maze);
+ int getCost(Maze maze);
 
 #endif

@@ -6,7 +6,7 @@
  * Its arguments are the same. However, after printing the
  * output (error message) the program aborts.
  */
-void error(char *msg, ...) {
+ void error(char *msg, ...) {
   va_list argp;
 
   fprintf(stderr, "\n");
@@ -26,7 +26,7 @@ void syntaxError(char filename[]) {
 /* read characters (skipping ' ' and '\t'). Returns first
  * encountered non-space character
  */
-int skipSpaces(FILE *f) {
+ int skipSpaces(FILE *f) {
   int c = ' ';
   while ((c != EOF) && (c!= '\n') && ((c == ' ') || (c == '\t'))) {
     c = fgetc(f);

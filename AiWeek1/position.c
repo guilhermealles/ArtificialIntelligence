@@ -4,7 +4,7 @@
 /* Read a position from file f. The result is placed in p.
  * The function returns 1 on success, 0 otherwise.
  */
-void readPositionFromFile(FILE *f, Position *p) {
+ void readPositionFromFile(FILE *f, Position *p) {
   if (fscanf(f, "%d %d %d", &p->x, &p->y, &p->z) != 3) {
     error("Error: failed to read position from file.\n");
   }
