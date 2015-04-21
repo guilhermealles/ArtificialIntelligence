@@ -38,14 +38,15 @@ void setMazeAccess(Maze *maze, Position pos, Direction dir) {
   y = pos.y;
   z = pos.z;
   maze->cell[x][y][z] |= dir;
-  /* set symmetric access (what goes up, must go down..) */
+ 
+/* set symmetric access (what goes up, must go down..) */
   switch (dir) {
     case NORTH: maze->cell[x][y+1][z] |= SOUTH; break;
     case SOUTH: maze->cell[x][y-1][z] |= NORTH; break;
     case WEST : maze->cell[x-1][y][z] |=  EAST; break;
     case EAST : maze->cell[x+1][y][z] |=  WEST; break;
     case UP   : maze->cell[x][y][z+1] |=  DOWN; break;
-    case DOWN : maze->cell[x][y][z-1] |=    UP; break;
+    case DOWN : maze->cell[x][y][z-1] |=  UP; break;
   }
 }
 
