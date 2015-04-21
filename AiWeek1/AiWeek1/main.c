@@ -1,15 +1,14 @@
-//
-//  main.c
-//  AiWeek1
-//
-//  Created by Guilherme Alles on 21/04/15.
-//  Copyright (c) 2015 Guilherme Alles. All rights reserved.
-//
-
 #include <stdio.h>
+#include <stdlib.h>
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
-    return 0;
+#include "maze.h"
+
+int main(int argc, char *argv[]) {
+  Maze maze;
+
+  readMazeFromFile(&maze, "maze3D.txt");
+
+  printMaze(maze);
+
+  return EXIT_SUCCESS;
 }

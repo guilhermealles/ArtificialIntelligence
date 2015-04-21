@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6E42A9611AE6646C0069A230"
+               BlueprintIdentifier = "6ED038B91AE6663D00884AFF"
                BuildableName = "AiWeek1"
                BlueprintName = "AiWeek1"
                ReferencedContainer = "container:AiWeek1.xcodeproj">
@@ -32,7 +32,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6E42A9611AE6646C0069A230"
+            BlueprintIdentifier = "6ED038B91AE6663D00884AFF"
             BuildableName = "AiWeek1"
             BlueprintName = "AiWeek1"
             ReferencedContainer = "container:AiWeek1.xcodeproj">
@@ -52,7 +52,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6E42A9611AE6646C0069A230"
+            BlueprintIdentifier = "6ED038B91AE6663D00884AFF"
             BuildableName = "AiWeek1"
             BlueprintName = "AiWeek1"
             ReferencedContainer = "container:AiWeek1.xcodeproj">
@@ -71,7 +71,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6E42A9611AE6646C0069A230"
+            BlueprintIdentifier = "6ED038B91AE6663D00884AFF"
             BuildableName = "AiWeek1"
             BlueprintName = "AiWeek1"
             ReferencedContainer = "container:AiWeek1.xcodeproj">
