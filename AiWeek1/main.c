@@ -4,11 +4,11 @@
 #include "maze.h"
 
 int main(int argc, char *argv[]) {
-  Maze maze;
+	Maze maze;
 
-  readMazeFromFile(&maze, "maze3D.txt");
+	readMazeFromFile(&maze, "maze3D.txt");
 
-  printMaze(maze);
+	printMaze(maze);
 
-  return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
