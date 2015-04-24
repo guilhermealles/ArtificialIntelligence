@@ -183,33 +183,20 @@ int canMoveTo(Maze maze, Direction dir) {
 /* prints all possible moves (in the current location) on the screen */
 void printPossibleMoves(Maze maze) {
 	const Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
-	const char* str_direction[6] = {"UP", "DOWN", "NORTH", "EAST", "SOUTH", "WEST"};
-	const char* str_possible = "possible.\n";
-	const char* str_not_possible = "NOT possible.\n";
 
-<<<<<<< HEAD
 	printCurrentPosition(maze);
 
 	for (int i = 0; i < 6; i++)
 	{
 		if (canMoveTo(maze, dir[i]) == 1) // movement is possible
 		{
-			printf("%s : possible\n", convertDirectionToString(dir[i]));
+			printf("\t%s\tpossible.\n", convertDirectionToString(dir[i]));
 		}
 		else
 		{
-			printf("%s : NOT possible\n", convertDirectionToString(dir[i]));
+			printf("\t%s\tNOT possible.\n", convertDirectionToString(dir[i]));
 		}
 	}  
-=======
-	Position current_position;
-	getPosition(maze, &current_position);
-
-	printf("Current location: "); printPositionWithNewline(current_position);
-	for (int i=0; i < 6; i++) {
-		printf("\t%s\t", str_direction[i]); if (canMoveTo(maze, dir[i])) printf("%s", str_possible); else printf("%s", str_not_possible);
-	}
->>>>>>> origin/master
 }
 
 /* returns true(1) if the goal state is reached, false otherwise */
