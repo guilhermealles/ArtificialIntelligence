@@ -2,6 +2,7 @@
 #include <string.h>
 #include "maze.h"
 #include "misc.h"
+#include "position.h"
 
 static void initMaze(Maze *maze, int width, int height, int depth) {
 	maze->dim[0] = width;
@@ -182,8 +183,19 @@ int canMoveTo(Maze maze, Direction dir) {
 /* prints all possible moves (in the current location) on the screen */
 void printPossibleMoves(Maze maze) {
 	Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
+	const char* str_possible = "possible.\n";
+	const char* str_not_possible = "NOT possible.\n";
 
-  /* implement this function */
+	Position current_position;
+	getPosition(maze, &current_position);
+
+	printf("Current location: "); printPositionWithNewline(current_position);
+	printf("\tUP\t"); if (canMoveTo(maze, UP)) printf("%s", str_possible); else printf("%s", str_not_possible);
+	printf("\tDOWN\t"); if (canMoveTo(maze, DOWN)) printf("%s", str_possible); else printf("%s", str_not_possible);
+	printf("\tNORTH\t"); if (canMoveTo(maze, NORTH)) printf("%s", str_possible); else printf("%s", str_not_possible);
+	printf("\tEAST\t"); if (canMoveTo(maze, EAST)) printf("%s", str_possible); else printf("%s", str_not_possible);
+	printf("\tSOUTH\t"); if (canMoveTo(maze, SOUTH)) printf("%s", str_possible); else printf("%s", str_not_possible);
+	printf("\tWEST\t"); if (canMoveTo(maze, WEST)) printf("%s", str_possible); else printf("%s", str_not_possible);
 
 }
 
