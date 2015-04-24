@@ -8,7 +8,10 @@ int main(int argc, char *argv[]) {
 
 	readMazeFromFile(&maze, "maze3D.txt");
 
+	printCurrentPosition(maze);
+	printGoal(maze);
 	printMaze(maze);
+	printPossibleMoves(maze);
 
 	return EXIT_SUCCESS;
 }

@@ -17,18 +17,18 @@ void getPosition(Maze maze, Position *pos) {
 	copyPosition(pos, maze.pos);
 }
 
-void printCurrentPosition ()
+void printCurrentPosition (Maze maze)
 {
-
+	printf("Current location: (%d, %d, %d) \n",  maze.pos.x, maze.pos.y, maze.pos.z);
 }
 
 void setGoal(Position g, Maze *maze) {
 	maze->goal = g;
 }
 
-void printGoal ()
+void printGoal (Maze maze)
 {
-
+	printf("Goal position: (%d, %d, %d) \n", maze.goal.x, maze.goal.y, maze.goal.z);
 }
 
 /* Returns the location of the goal state in goal */
@@ -183,8 +183,19 @@ int canMoveTo(Maze maze, Direction dir) {
 void printPossibleMoves(Maze maze) {
 	Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
 
-  /* implement this function */
+	printCurrentPosition(maze);
 
+	for (int i = 0; i < 6; i++)
+	{
+		if (canMoveTo(maze, dir[i]) == 1) // movement is possible
+		{
+			printf("%s : possible\n", convertDirectionToString(dir[i]));
+		}
+		else
+		{
+			printf("%s : NOT possible\n", convertDirectionToString(dir[i]));
+		}
+	}  
 }
 
 /* returns true(1) if the goal state is reached, false otherwise */
