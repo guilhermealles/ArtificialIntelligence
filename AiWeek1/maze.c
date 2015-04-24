@@ -202,9 +202,12 @@ void printPossibleMoves(Maze maze) {
 /* returns true(1) if the goal state is reached, false otherwise */
 int isSolved(Maze maze) {
 
-  /* implement this function */
-
-  return 1;  /* TRUE==1 */
+	if (isEqualPosition(maze.pos, maze.goal)) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
 }
 
 /* make a move in the specified direction. Returns true(1) if
@@ -212,7 +215,42 @@ int isSolved(Maze maze) {
  */
  int makeMove(Maze *maze, Direction dir) {
 
-  /* implement this function */
+ 	if (canMoveTo(*maze, dir) == 0) {
+ 		return 0;
+ 	}
+ 	else {
+ 		// Add current position to path
+ 		appendPositionToPath(&(maze->path), maze->pos);
 
-  return 1;  /* TRUE==1 */
- }
+ 		Position new_position = maze->pos;
+ 		// Set new position according to direction
+ 		switch (dir) {
+ 			case UP:
+ 				new_position.z += 1;
+ 				break;
+ 			case DOWN:
+ 				new_position.z -= 1;
+ 				break;
+ 			case NORTH:
+ 				new_position.y += 1;
+ 				break;
+ 			case EAST:
+ 				new_position.x += 1;
+ 				break;
+ 			case SOUTH:
+ 				new_position.y -= 1;
+ 				break;
+ 			case WEST:
+ 				new_position.x -= 1;
+ 				break;
+ 			default:
+ 				return 0;
+ 		}
+ 		// Replace old position with new position
+ 		copyPosition(&(maze->pos), new_position);
+
+ 		// Increment cost
+ 		maze->cost += 1;
+ 		return 1;
+ 	}
+}
