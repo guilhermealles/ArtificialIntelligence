@@ -182,7 +182,8 @@ int canMoveTo(Maze maze, Direction dir) {
 
 /* prints all possible moves (in the current location) on the screen */
 void printPossibleMoves(Maze maze) {
-	Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
+	const Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
+	const char* str_direction[6] = {"UP", "DOWN", "NORTH", "EAST", "SOUTH", "WEST"};
 	const char* str_possible = "possible.\n";
 	const char* str_not_possible = "NOT possible.\n";
 
@@ -190,13 +191,9 @@ void printPossibleMoves(Maze maze) {
 	getPosition(maze, &current_position);
 
 	printf("Current location: "); printPositionWithNewline(current_position);
-	printf("\tUP\t"); if (canMoveTo(maze, UP)) printf("%s", str_possible); else printf("%s", str_not_possible);
-	printf("\tDOWN\t"); if (canMoveTo(maze, DOWN)) printf("%s", str_possible); else printf("%s", str_not_possible);
-	printf("\tNORTH\t"); if (canMoveTo(maze, NORTH)) printf("%s", str_possible); else printf("%s", str_not_possible);
-	printf("\tEAST\t"); if (canMoveTo(maze, EAST)) printf("%s", str_possible); else printf("%s", str_not_possible);
-	printf("\tSOUTH\t"); if (canMoveTo(maze, SOUTH)) printf("%s", str_possible); else printf("%s", str_not_possible);
-	printf("\tWEST\t"); if (canMoveTo(maze, WEST)) printf("%s", str_possible); else printf("%s", str_not_possible);
-
+	for (int i=0; i < 6; i++) {
+		printf("\t%s\t", str_direction[i]); if (canMoveTo(maze, dir[i])) printf("%s", str_possible); else printf("%s", str_not_possible);
+	}
 }
 
 /* returns true(1) if the goal state is reached, false otherwise */
