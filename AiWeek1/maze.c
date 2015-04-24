@@ -2,6 +2,7 @@
 #include <string.h>
 #include "maze.h"
 #include "misc.h"
+#include "position.h"
 
 static void initMaze(Maze *maze, int width, int height, int depth) {
 	maze->dim[0] = width;
@@ -181,8 +182,12 @@ int canMoveTo(Maze maze, Direction dir) {
 
 /* prints all possible moves (in the current location) on the screen */
 void printPossibleMoves(Maze maze) {
-	Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
+	const Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
+	const char* str_direction[6] = {"UP", "DOWN", "NORTH", "EAST", "SOUTH", "WEST"};
+	const char* str_possible = "possible.\n";
+	const char* str_not_possible = "NOT possible.\n";
 
+<<<<<<< HEAD
 	printCurrentPosition(maze);
 
 	for (int i = 0; i < 6; i++)
@@ -196,6 +201,15 @@ void printPossibleMoves(Maze maze) {
 			printf("%s : NOT possible\n", convertDirectionToString(dir[i]));
 		}
 	}  
+=======
+	Position current_position;
+	getPosition(maze, &current_position);
+
+	printf("Current location: "); printPositionWithNewline(current_position);
+	for (int i=0; i < 6; i++) {
+		printf("\t%s\t", str_direction[i]); if (canMoveTo(maze, dir[i])) printf("%s", str_possible); else printf("%s", str_not_possible);
+	}
+>>>>>>> origin/master
 }
 
 /* returns true(1) if the goal state is reached, false otherwise */
