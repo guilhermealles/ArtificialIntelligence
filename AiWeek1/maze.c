@@ -18,18 +18,8 @@ void getPosition(Maze maze, Position *pos) {
 	copyPosition(pos, maze.pos);
 }
 
-void printCurrentPosition (Maze maze)
-{
-	printf("Current location: (%d, %d, %d) \n",  maze.pos.x, maze.pos.y, maze.pos.z);
-}
-
 void setGoal(Position g, Maze *maze) {
 	maze->goal = g;
-}
-
-void printGoal (Maze maze)
-{
-	printf("Goal position: (%d, %d, %d) \n", maze.goal.x, maze.goal.y, maze.goal.z);
 }
 
 /* Returns the location of the goal state in goal */
