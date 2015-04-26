@@ -11,23 +11,32 @@ int main(int argc, char *argv[]) {
 	unsigned int solution_count = 13;
 	Direction solution[] = {EAST, NORTH, EAST, SOUTH, EAST, NORTH, UP, WEST, WEST, NORTH, NORTH, DOWN, SOUTH};
 
+	Position position, goal;
+	getPosition(maze, &position);
+	getGoal(maze, &goal);
+
+	printf("Current position: "); printPositionWithNewline(position);
+	printf("Goal: "); printPositionWithNewline(goal); printf("\n");
+
 	printMaze(maze);
-	
-	for (int i = 0; i < solution_count; i++) {
+
+	printPossibleMoves(maze);
+	printf("\n");
+
+	for (int i=0; i < solution_count; i++) {
 		if (makeMove(&maze, solution[i]) == 1) {
-			printf("Successfuly moved to direction: %s\n", convertDirectionToString(solution[i]));
+			if (isSolved(maze)) {
+				printf("Maze solved!\n");
+				printPathWithNewline(maze.path);
+				break;
+			}
+			else {
+				printf("Movement successful, maze not solved.\n");
+			}
 		}
 		else {
 			printf("Error moving from: "); printPosition(maze.pos); printf (" to %s\n", convertDirectionToString(solution[i]));
 		}
 	}
-
-	if (isSolved(maze)) {
-		printf("Success!\n");
-	}
-	else {
-		printf("Failure :(.\n");
-	}
-
 	return EXIT_SUCCESS;
 }

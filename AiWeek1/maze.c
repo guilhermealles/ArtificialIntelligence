@@ -219,9 +219,6 @@ int isSolved(Maze maze) {
  		return 0;
  	}
  	else {
- 		// Add current position to path
- 		appendPositionToPath(&(maze->path), maze->pos);
-
  		Position new_position = maze->pos;
  		// Set new position according to direction
  		switch (dir) {
@@ -248,6 +245,9 @@ int isSolved(Maze maze) {
  		}
  		// Replace old position with new position
  		copyPosition(&(maze->pos), new_position);
+
+ 		// Add new position to path
+ 		appendPositionToPath(&(maze->path), maze->pos);
 
  		// Increment cost
  		maze->cost += 1;
