@@ -11,6 +11,8 @@ void solveMaze(Maze maze) {
   Position pos, goal;
   State state, successor;
   int i, priority;
+
+  int visitCount=0, pushCount=0;
   
   getPosition(maze, &pos);
   getGoal(maze, &goal);
@@ -23,6 +25,7 @@ void solveMaze(Maze maze) {
   pushPqueue(&fringe, state);
     
   while (!isEmptyPqueue(fringe) && !isSolved(maze)) {
+    visitCount++;
     topPqueue(fringe, &state);
     popPqueue(&fringe);  
     setMazeState(&maze, state);    
@@ -46,6 +49,7 @@ void solveMaze(Maze maze) {
         priority = random();
         setStatePriority(&successor, priority);
         pushPqueue(&fringe, successor);
+        pushCount++;
         /* undo move */
         setMazeState(&maze, state);
       }
@@ -54,6 +58,7 @@ void solveMaze(Maze maze) {
   if (isSolved(maze)) {
    printf ("MAZE SOLVED: Path=");
    printPathWithNewline(maze.path);
+   printf("\n\nvisitCount = %d \t pushCount = %d.\n", visitCount, pushCount);
   } else {
 	  printf ("NO PATH FOUND\n");
   }
