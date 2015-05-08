@@ -174,7 +174,9 @@ int canMoveTo(Maze maze, Direction dir) {
 void printPossibleMoves(Maze maze) {
 	const Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
 
-	printCurrentPosition(maze);
+	Position position;
+	getPosition(maze, &position);
+	printf("Current position: "); printPositionWithNewline(position);
 
 	for (int i = 0; i < 6; i++)
 	{
