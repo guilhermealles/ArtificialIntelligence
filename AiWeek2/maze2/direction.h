@@ -4,7 +4,7 @@
 /* Implements the enumeration type Direction. */
 
 typedef enum Direction { /* Defines UP, DOWN, .... */
-  NORTH=1, EAST=2, SOUTH=4, WEST=8, UP=16, DOWN=32
+	NORTH=1, EAST=2, SOUTH=4, WEST=8, UP=16, DOWN=32
 } Direction;
 
 /* returns an ASCII string respresentation of a direction */
