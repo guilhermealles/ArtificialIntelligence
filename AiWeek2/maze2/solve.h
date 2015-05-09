@@ -9,7 +9,8 @@ void solveMaze(Maze maze);
 void solveMazeDFS(Maze maze);
 void solveMazeBFS(Maze maze);
 void solveMazeIDA(Maze maze);
-Maze solveMazeDLS(Maze maze, int depth_limit, int *partial_visit_count, int *partial_push_count);
+void solveMazeDLS(Maze *maze, int depth_limit, int *visit_count_ptr, int *push_count_ptr);
 void solveMazeAstar(Maze maze);
+int aStarEvaluate(State s, Position goal);
 
 #endif
