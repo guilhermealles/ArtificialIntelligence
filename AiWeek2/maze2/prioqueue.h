@@ -17,4 +17,7 @@ void pushPqueue(Pqueue *pq, State s);
 void topPqueue(Pqueue pq, State *s);
 void popPqueue(Pqueue *pq);
 
+// Returns 1 if the same position is found in priority queue, 0 otherwise
+int existsInPqueue(Pqueue pq, State state);
+
 #endif

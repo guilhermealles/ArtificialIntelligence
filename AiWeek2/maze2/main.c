@@ -64,6 +64,66 @@ void solveMaze(Maze maze) {
   }
 }
 
+void solveMazeDFS(Maze maze) {
+	Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
+	Pqueue fringe, visited;
+	Position pos, goal;
+	State state, successor;
+	int i, priority;
+
+	int visitCount=0, pushCount=0;
+
+	getPosition(maze, &pos);
+	getGoal(maze, &goal);
+
+	getMazeState(&state, maze);
+	priority = getPqueueSize(fringe);
+	setStatePriority(&state, priority);
+
+	initPqueue(&fringe);
+	pushPqueue(&fringe, state);
+
+	while (!isEmptyPqueue(fringe) && !isSolved(maze))
+	{
+		visitCount++;
+		topPqueue(fringe, &state);
+		popPqueue(&fringe);  
+		setMazeState(&maze, state); 
+		// Add current state to the visited list
+		pushPqueue(&visited, state);   
+		printState(state);
+		for (i=0; i<6; i++)
+		{
+			if (canMoveTo(maze, dir[i]))
+			{
+        		/* make move in direction dir[i] */
+				makeMove(&maze, dir[i]);
+        		/* get new state (i.e. is a successor) */
+        		getMazeState(&successor, maze);		
+        		// If successor has not yet been visited, add it to the fringe. Otherwise, just ignore
+        		if (existsInPqueue(visited, successor) == 0)
+        		{
+        			/* set priority of successor an put it in the fringe */
+        			priority = getPqueueSize(fringe);
+        			setStatePriority(&successor, priority);
+        			pushPqueue(&fringe, successor);
+        			pushCount++;
+        		}
+        		/* undo move */
+        		setMazeState(&maze, state);
+    		}
+		}
+	}
+	if (isSolved(maze)) {
+		printf ("MAZE SOLVED: Path=");
+		printPathWithNewline(maze.path);
+		printf("\n\nvisitCount = %d \t pushCount = %d.\n", visitCount, pushCount);
+	}
+	else {
+		printf ("NO PATH FOUND\n");
+	}
+}
+
 int main(int argc, char *argv[]) {
   Maze maze;
   Position pos, goal;
@@ -80,7 +140,7 @@ int main(int argc, char *argv[]) {
 
   printMaze(maze);
 
-  solveMaze(maze);
+  solveMazeDFS(maze);
   
   return EXIT_SUCCESS;
 }
