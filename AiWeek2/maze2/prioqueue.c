@@ -87,3 +87,15 @@ void popPqueue(Pqueue *pq) {
   pq->states[1] = pq->states[pq->qsize--];
   heapify(1, pq->qsize, pq->states);
 }
+
+int existsInPqueue(Pqueue pq, State state) {
+	Position state_position = state.pos;
+	int i=0;
+
+	for (i=0; i<pq.qsize; i++) {
+		if (isEqualPosition(state_position, pq.states[i].pos)) {
+			return 1;
+		}
+	}
+	return 0;
+}

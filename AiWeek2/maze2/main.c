@@ -4,6 +4,7 @@
 #include "maze.h"
 #include "state.h"
 #include "prioqueue.h"
+<<<<<<< HEAD
 
 void solveMaze(Maze maze) {
   Direction dir[6]={UP, DOWN, NORTH, EAST, SOUTH, WEST};
@@ -59,12 +60,15 @@ void solveMaze(Maze maze) {
 	  printf ("NO PATH FOUND\n");
   }
 }
+=======
+#include "solve.h"
+>>>>>>> origin/master
 
 int main(int argc, char *argv[]) {
   Maze maze;
   Position pos, goal;
   
-  readMazeFromFile(&maze, "maze3D.txt");
+  readMazeFromFile(&maze, "/Users/Alles/Development/XCode/ArtificialIntelligence/AiWeek2/maze2/maze3D.txt");
 
   getPosition(maze, &pos);
   printf ("The initial position is ");
@@ -76,7 +80,7 @@ int main(int argc, char *argv[]) {
 
   printMaze(maze);
 
-  solveMaze(maze);
+  solveMazeAstar(maze);
   
   return EXIT_SUCCESS;
 }
