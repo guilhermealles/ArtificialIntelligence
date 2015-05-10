@@ -8,8 +8,9 @@
  *       contain pointers!
  */
 
-typedef struct {
+typedef struct State {
   int value;
+  char* operation;
 } State;
 
 #endif

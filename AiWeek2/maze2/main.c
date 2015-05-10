@@ -27,6 +27,7 @@ void solveMaze(Maze maze) {
     popPqueue(&fringe);  
     setMazeState(&maze, state);    
     printState(state);
+    
     for (i=0; i<6; i++) {
       if (canMoveTo(maze, dir[i])) {
         /* make move in direction dir[i] */

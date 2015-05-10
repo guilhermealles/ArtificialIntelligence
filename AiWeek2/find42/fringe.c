@@ -9,8 +9,9 @@ Fringe makeFringe(int mode) {
    * The mode can be LIFO(=STACK), FIFO, or PRIO(=HEAP) 
    */
   Fringe f;
-  if ((mode != LIFO) && (mode != STACK) && (mode != FIFO) &&
-      (mode != PRIO) && (mode != HEAP)) {
+  
+  if ((mode != LIFO) && (mode != STACK) && (mode != FIFO) && (mode != PRIO) && (mode != HEAP)) 
+  {
     fprintf(stderr, "makeFringe(mode=%d): incorrect mode. ", mode);
     fprintf(stderr, "(mode <- [LIFO,STACK,FIFO,PRIO,HEAP])\n");
     exit(EXIT_FAILURE);
@@ -18,7 +19,9 @@ Fringe makeFringe(int mode) {
   f.mode = mode;
   f.size = f.front = f.rear = 0; /* front+rear only used in FIFO mode */
   f.states = malloc(MAXF*sizeof(State));
-  if (f.states == NULL) {
+  
+  if (f.states == NULL) 
+  {
 	fprintf(stderr, "makeFringe(): memory allocation failed.\n");
     exit(EXIT_FAILURE);      
   }
@@ -54,6 +57,7 @@ Fringe insertFringe(Fringe fringe, State s, ...) {
     exit(EXIT_FAILURE);    
   }
   fringe.insertCnt++;
+  
   switch (fringe.mode) {
   case LIFO: /* LIFO == STACK */
   case STACK:
@@ -77,6 +81,7 @@ Fringe insertFringe(Fringe fringe, State s, ...) {
     break;
   }
   fringe.size++;
+  
   if (fringe.size > fringe.maxSize) {
     fringe.maxSize = fringe.size;
   }
