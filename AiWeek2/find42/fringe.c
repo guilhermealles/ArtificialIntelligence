@@ -80,7 +80,6 @@ Fringe insertFringe(Fringe fringe, State s, ...) {
             va_end(argument);
             fringe.states[fringe.size] = s;
             fringe.priorities[fringe.size] = priority;
-            exit(EXIT_FAILURE);
             break;
     }
     fringe.size++;
@@ -91,35 +90,54 @@ Fringe insertFringe(Fringe fringe, State s, ...) {
 }
 
 int getLowestPriorityIndex(Fringe fringe) {
-    return 0;
+    int min_index=0, min_priority=0, i=0;
+    for (i=0; i<fringe.size; i++) {
+        if (fringe.priorities[i] < min_priority) {
+            min_priority = fringe.priorities[i];
+            min_index = i;
+        }
+    }
+    return i;
+}
+
+Fringe defragFringe(Fringe fringe, int index) {
+    if (index < fringe.size-1) {
+        for (int i=index+1; i<fringe.size-1; i++) {
+            fringe.states[i-1] = fringe.states[i];
+            fringe.priorities[i-1] = fringe.priorities[i];
+        }
+    }
+    return fringe;
 }
 
 Fringe removeFringe(Fringe fringe, State *s) {
-  /* Removes an element from the fringe, and returns it in s. 
-   * Moreover, the new fringe is returned.
-   */
-  if (fringe.size < 1) {
-    fprintf(stderr, "removeFringe(..): fatal error, empty fringe.\n");
-    exit(EXIT_FAILURE);    
-  }
-  fringe.deleteCnt++;
-  fringe.size--;
-  switch (fringe.mode) {
-  case LIFO: /* LIFO == STACK */
-  case STACK:
-    *s = fringe.states[fringe.size];
-    break;
-  case FIFO:
-    *s = fringe.states[fringe.front++];
-    fringe.front %= MAXF;
-    break;
-  case PRIO: /* PRIO == HEAP */
-  case HEAP:
-    printf ("HEAP NOT IMPLEMENTED YET\n");
-    exit(EXIT_FAILURE);
-    break;
-  }
-  return fringe;
+    /* Removes an element from the fringe, and returns it in s. 
+     * Moreover, the new fringe is returned.
+     */
+    if (fringe.size < 1) {
+        fprintf(stderr, "removeFringe(..): fatal error, empty fringe.\n");
+        exit(EXIT_FAILURE);
+    }
+    fringe.deleteCnt++;
+    fringe.size--;
+    int lowest_priority_index;
+    switch (fringe.mode) {
+        case LIFO: /* LIFO == STACK */
+        case STACK:
+            *s = fringe.states[fringe.size];
+            break;
+        case FIFO:
+            *s = fringe.states[fringe.front++];
+            fringe.front %= MAXF;
+            break;
+        case PRIO: /* PRIO == HEAP */
+        case HEAP:
+            lowest_priority_index = getLowestPriorityIndex(fringe);
+            *s = fringe.states[lowest_priority_index];
+            defragFringe(fringe, lowest_priority_index);
+            break;
+    }
+    return fringe;
 }
 
 void showStats(Fringe fringe) {
