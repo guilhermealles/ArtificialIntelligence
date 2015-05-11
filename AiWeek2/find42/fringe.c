@@ -5,33 +5,36 @@
 #include "fringe.h"
 
 Fringe makeFringe(int mode) {
-  /* Returns an empty fringe. 
-   * The mode can be LIFO(=STACK), FIFO, or PRIO(=HEAP) 
-   */
-  Fringe f;
-  
-  if ((mode != LIFO) && (mode != STACK) && (mode != FIFO) && (mode != PRIO) && (mode != HEAP)) 
-  {
-    fprintf(stderr, "makeFringe(mode=%d): incorrect mode. ", mode);
-    fprintf(stderr, "(mode <- [LIFO,STACK,FIFO,PRIO,HEAP])\n");
-    exit(EXIT_FAILURE);
-  }
-  f.mode = mode;
-  f.size = f.front = f.rear = 0; /* front+rear only used in FIFO mode */
-  f.states = malloc(MAXF*sizeof(State));
-  
-  if (f.states == NULL) 
-  {
-	fprintf(stderr, "makeFringe(): memory allocation failed.\n");
-    exit(EXIT_FAILURE);      
-  }
-  f.maxSize = f.insertCnt = f.deleteCnt = 0;
-  return f;
+    /* Returns an empty fringe.
+     * The mode can be LIFO(=STACK), FIFO, or PRIO(=HEAP)
+     */
+    Fringe f;
+    if ((mode != LIFO) && (mode != STACK) && (mode != FIFO) &&
+        (mode != PRIO) && (mode != HEAP)) {
+        fprintf(stderr, "makeFringe(mode=%d): incorrect mode. ", mode);
+        fprintf(stderr, "(mode <- [LIFO,STACK,FIFO,PRIO,HEAP])\n");
+        exit(EXIT_FAILURE);
+    }
+    f.mode = mode;
+    f.size = f.front = f.rear = 0; /* front+rear only used in FIFO mode */
+    f.states = malloc(MAXF*sizeof(State));
+    if (mode == PRIO || mode == HEAP) {
+        f.priorities = malloc(MAXF*sizeof(int));
+    }
+    if (f.states == NULL) {
+        fprintf(stderr, "makeFringe(): memory allocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    f.maxSize = f.insertCnt = f.deleteCnt = 0;
+    return f;
 }
 
 void deallocFringe(Fringe fringe) {
-  /* Frees the memory allocated for the fringe */
-  free(fringe.states);
+    /* Frees the memory allocated for the fringe */
+    free(fringe.states);
+    if (fringe.mode == PRIO || fringe.mode == HEAP) {
+        free(fringe.priorities);
+    }
 }
 
 int getFringeSize(Fringe fringe) {
@@ -46,46 +49,49 @@ int isEmptyFringe(Fringe fringe) {
 }
 
 Fringe insertFringe(Fringe fringe, State s, ...) {
-  /* Inserts s in the fringe, and returns the new fringe.
-   * This function needs a third parameter in PRIO(HEAP) mode.
-   */
-  int priority;
-  va_list argument;
-
-  if (fringe.size == MAXF) {
-    fprintf(stderr, "insertFringe(..): fatal error, out of memory.\n");
-    exit(EXIT_FAILURE);    
-  }
-  fringe.insertCnt++;
-  
-  switch (fringe.mode) {
-  case LIFO: /* LIFO == STACK */
-  case STACK:
-    fringe.states[fringe.size] = s;
-    break;
-  case FIFO:
-    fringe.states[fringe.rear++] = s;
-    fringe.rear %= MAXF;
-    break;
-  case PRIO: /* PRIO == HEAP */
-  case HEAP:
-    /* Get the priority from the 3rd argument of this function.
-     * You are not supposed to understand the following 5 code lines.
+    /* Inserts s in the fringe, and returns the new fringe.
+    * This function needs a third parameter in PRIO(HEAP) mode.
      */
-    va_start(argument, s); 
-    priority = va_arg(argument, int);
-    printf("priority = %d ", priority);
-    va_end(argument);
-    printf ("HEAP NOT IMPLEMENTED YET\n");
-    exit(EXIT_FAILURE);
-    break;
-  }
-  fringe.size++;
-  
-  if (fringe.size > fringe.maxSize) {
-    fringe.maxSize = fringe.size;
-  }
-  return fringe;
+    int priority;
+    va_list argument;
+
+    if (fringe.size == MAXF) {
+        fprintf(stderr, "insertFringe(..): fatal error, out of memory.\n");
+        exit(EXIT_FAILURE);
+    }
+    fringe.insertCnt++;
+    switch (fringe.mode) {
+        case LIFO: /* LIFO == STACK */
+        case STACK:
+            fringe.states[fringe.size] = s;
+            break;
+        case FIFO:
+            fringe.states[fringe.rear++] = s;
+            fringe.rear %= MAXF;
+            break;
+        case PRIO: /* PRIO == HEAP */
+        case HEAP:
+            /* Get the priority from the 3rd argument of this function.
+             * You are not supposed to understand the following 5 code lines.
+             */
+            va_start(argument, s);
+            priority = va_arg(argument, int);
+            printf("priority = %d ", priority);
+            va_end(argument);
+            fringe.states[fringe.size] = s;
+            fringe.priorities[fringe.size] = priority;
+            exit(EXIT_FAILURE);
+            break;
+    }
+    fringe.size++;
+    if (fringe.size > fringe.maxSize) {
+        fringe.maxSize = fringe.size;
+    }
+    return fringe;
+}
+
+int getLowestPriorityIndex(Fringe fringe) {
+    return 0;
 }
 
 Fringe removeFringe(Fringe fringe, State *s) {

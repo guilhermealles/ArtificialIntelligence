@@ -1,8 +1,6 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "path.h"
-
 /* The type State is a data type that represents a possible state 
  * of a search problem. It can be a complicated structure, but it 
  * can also be a simple type (like int, char, ..). 
@@ -10,9 +8,10 @@
  *       contain pointers!
  */
 
-typedef struct State {
-  int value;
-  Path path;
+typedef struct state{
+    int value;
+    char operation[3]; // The operation that brought to this state
+    struct state *parent;
 } State;
 
 #endif

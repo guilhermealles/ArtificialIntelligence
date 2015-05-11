@@ -13,14 +13,15 @@
 #define HEAP  5
 
 typedef struct Fringe {
-  int mode;      /* can be LIFO(STACK), FIFO, or PRIO(HEAP)          */
-  int size;      /* number of elements in the fringe                 */
-  int front;     /* index of first element in the fringe (FIFO mode) */
-  int rear;      /* index of last element in the fringe (FIFO mode)  */
-  State *states; /* fringe data (states)                             */
-  int insertCnt; /* counts the number of insertions                  */
-  int deleteCnt; /* counts the number of removals (deletions)        */
-  int maxSize;   /* maximum size of the fringe during search         */
+    int mode;      /* can be LIFO(STACK), FIFO, or PRIO(HEAP)          */
+    int size;      /* number of elements in the fringe                 */
+    int front;     /* index of first element in the fringe (FIFO mode) */
+    int rear;      /* index of last element in the fringe (FIFO mode)  */
+    State *states; /* fringe data (states) */
+    int *priorities; /* priorities data */
+    int insertCnt; /* counts the number of insertions                  */
+    int deleteCnt; /* counts the number of removal9hs (deletions)        */
+    int maxSize;   /* maximum size of the fringe during search         */
 } Fringe;
 
 Fringe makeFringe(int mode);
