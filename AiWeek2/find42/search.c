@@ -98,7 +98,6 @@ void search(int mode, int start, int goal) {
 
 int main(int argc, char *argv[]) {
     int start, goal, fringetype;
-    /*
     if ((argc == 1) || (argc > 4)) {
         fprintf(stderr, "Usage: %s <STACK|FIFO|HEAP> [start] [goal]\n", argv[0]);
         return EXIT_FAILURE;
@@ -116,9 +115,9 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s <STACK|FIFO|HEAP> [start] [goal]\n", argv[0]);
         return EXIT_FAILURE;
     }
-     */
     
-    fringetype = STACK;
+    
+    //fringetype = STACK;
     start = 0;
     goal = 42;
     if (argc == 3) {
