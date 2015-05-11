@@ -17,7 +17,7 @@ int alreadyVisited(State s, State *visited, int visited_count) {
   return 0;
 }
 
-Fringe insertValidSucc(Fringe fringe, int value, State *visited, int visited_count, char *operation) {
+Fringe insertValidSucc(Fringe fringe, int value, State *visited, int visited_count, char *operation, ...) {
     State s;
     s.value = value;
     s.parent = &visited[visited_count-1];
@@ -26,7 +26,14 @@ Fringe insertValidSucc(Fringe fringe, int value, State *visited, int visited_cou
         /* ignore states that are out of bounds */
         return fringe;
     }
-    return insertFringe(fringe, s);
+    int priority;
+    va_list argument;
+
+    va_start(argument, s);
+    priority = va_arg(argument, int);
+    va_end(argument);
+
+    return insertFringe(fringe, s, priority);
 }
 
 void printPath(State s, int visited_count) {
@@ -50,9 +57,18 @@ void printPath(State s, int visited_count) {
     printf("\n");
 }
 
-double aStarEvaluate(int start, int goal)
+int aStarEvaluate(int start, int goal, State parent)
 {
-    return (double)abs(goal - start)/3;
+    int path_cost = 0;
+    State* parent_pointer = &parent;
+
+    while(parent_pointer->parent != NULL)
+    {
+        path_cost++;
+        parent_pointer = parent_pointer->parent;
+    }
+
+    return -(1+path_cost);
 }
 
 void search(int mode, int start, int goal) {
@@ -82,13 +98,27 @@ void search(int mode, int start, int goal) {
             goalReached = 1;
             break;
         }
-        /* insert neighbouring states */
-        fringe = insertValidSucc(fringe, value+1, visited, visited_count, "+1"); /* rule n->n + 1      */
-        fringe = insertValidSucc(fringe, 2*value, visited, visited_count, "*2"); /* rule n->2*n        */
-        fringe = insertValidSucc(fringe, 3*value, visited, visited_count, "*3"); /* rule n->3*n        */
-        fringe = insertValidSucc(fringe, value-1, visited, visited_count, "-1"); /* rule n->n - 1      */
-        fringe = insertValidSucc(fringe, value/2, visited, visited_count, "/2"); /* rule n->floor(n/2) */
-        fringe = insertValidSucc(fringe, value/3, visited, visited_count, "/3"); /* rule n->floor(n/3) */
+        
+        if (mode == PRIO || mode == HEAP)
+        {
+            fringe = insertValidSucc(fringe, value+1, visited, visited_count, "+1", aStarEvaluate(value+1, goal, state)); /* rule n->n + 1      */
+            fringe = insertValidSucc(fringe, 2*value, visited, visited_count, "*2", aStarEvaluate(value*2, goal, state)); /* rule n->2*n        */
+            fringe = insertValidSucc(fringe, 3*value, visited, visited_count, "*3", aStarEvaluate(value*3, goal, state)); /* rule n->3*n        */
+            fringe = insertValidSucc(fringe, value-1, visited, visited_count, "-1", aStarEvaluate(value-1, goal, state)); /* rule n->n - 1      */
+            fringe = insertValidSucc(fringe, value/2, visited, visited_count, "/2", aStarEvaluate(value/2, goal, state)); /* rule n->floor(n/2) */
+            fringe = insertValidSucc(fringe, value/3, visited, visited_count, "/3", aStarEvaluate(value/3, goal, state)); /* rule n->floor(n/3) */
+        }
+        else
+        {
+            /* insert neighbouring states */
+            fringe = insertValidSucc(fringe, value+1, visited, visited_count, "+1"); /* rule n->n + 1      */
+            fringe = insertValidSucc(fringe, 2*value, visited, visited_count, "*2"); /* rule n->2*n        */
+            fringe = insertValidSucc(fringe, 3*value, visited, visited_count, "*3"); /* rule n->3*n        */
+            fringe = insertValidSucc(fringe, value-1, visited, visited_count, "-1"); /* rule n->n - 1      */
+            fringe = insertValidSucc(fringe, value/2, visited, visited_count, "/2"); /* rule n->floor(n/2) */
+            fringe = insertValidSucc(fringe, value/3, visited, visited_count, "/3"); /* rule n->floor(n/3) */
+        }
+
     }
     if (goalReached == 0) {
         printf("goal not reachable ");

@@ -76,7 +76,6 @@ Fringe insertFringe(Fringe fringe, State s, ...) {
              */
             va_start(argument, s);
             priority = va_arg(argument, int);
-            printf("priority = %d ", priority);
             va_end(argument);
             fringe.states[fringe.size] = s;
             fringe.priorities[fringe.size] = priority;
