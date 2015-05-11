@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -g -O3
-INCLUDES=state.h fringe.h
+INCLUDES=state.h fringe.h path.h
 
 OBJECTS=search.o fringe.o
 

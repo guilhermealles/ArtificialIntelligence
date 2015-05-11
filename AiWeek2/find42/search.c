@@ -48,7 +48,7 @@ void printPath (Path path)
 }
 
 void search(int mode, int start, int goal) {
-    printf("Dentro de search\n");
+  printf("Dentro de search\n");
   Fringe fringe;
   State state;
   int goalReached = 0;
