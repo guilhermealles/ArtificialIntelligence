@@ -50,6 +50,11 @@ void printPath(State s, int visited_count) {
     printf("\n");
 }
 
+double aStarEvaluate(int start, int goal)
+{
+    return (double)abs(goal - start)/3;
+}
+
 void search(int mode, int start, int goal) {
     Fringe fringe;
     State state;
@@ -95,6 +100,7 @@ void search(int mode, int start, int goal) {
     showStats(fringe);
     deallocFringe(fringe);
 }
+
 
 int main(int argc, char *argv[]) {
     int start, goal, fringetype;
