@@ -3,8 +3,8 @@
 #include <string.h>
 
 #include "state.h"
-#include "fringe.h"
 #include "path.h"
+#include "fringe.h"
 
 #define RANGE 1000000
 
@@ -21,7 +21,7 @@ int containsValue(State list[], int value, int list_size)
   return 0;
 }
 
-Fringe insertValidSucc (Fringe fringe, int value, State* visited_states, int visited_states_count, char* operation, Path* path) {
+Fringe insertValidSucc (Fringe fringe, int value, State* visited_states, int visited_states_count, char* operation) {
   State s;
 
   if ((value < 0) || (value > RANGE) || containsValue(visited_states, value, visited_states_count)) {
@@ -30,37 +30,26 @@ Fringe insertValidSucc (Fringe fringe, int value, State* visited_states, int vis
   }
   s.value = value;
   s.operation = operation;
-  path->path[path->length] = visited_states[visited_states_count-1];
-  path->length++;
 
   return insertFringe(fringe, s);
 }
 
-void printPath (Path path)
-{
-  printf("%d ", path.path[0].value);
-
-  for(int i = 1; i < path.length; i++)
-  {
-    printf(" (%s) -> ", path.path[i].operation);
-    printf("%d ", path.path[i].value);
-  }
-}
-
 void search(int mode, int start, int goal) {
+<<<<<<< HEAD
   printf("Dentro de search\n");
+=======
+    //printf("Dentro de search\n");
+>>>>>>> origin/master
   Fringe fringe;
   State state;
   int goalReached = 0;
   int visited = 0;
   int value;
   State visited_states[MAXF];
-  Path path_to_goal;
 
   fringe = makeFringe(mode);
   state.value = start;
   state.operation = NULL;
-  path_to_goal.length = 0;
   fringe = insertFringe(fringe, state);
   
   while (!isEmptyFringe(fringe)) {
@@ -77,18 +66,17 @@ void search(int mode, int start, int goal) {
     }
 
     /* insert neighbouring states */
-    fringe = insertValidSucc(fringe, value+1, visited_states, visited, "+1", &path_to_goal); /* rule n->n + 1      */
-    fringe = insertValidSucc(fringe, 2*value, visited_states, visited, "*2", &path_to_goal); /* rule n->2*n        */
-    fringe = insertValidSucc(fringe, 3*value, visited_states, visited, "*3", &path_to_goal); /* rule n->3*n        */
-    fringe = insertValidSucc(fringe, value-1, visited_states, visited, "-1", &path_to_goal); /* rule n->n - 1      */
-    fringe = insertValidSucc(fringe, value/2, visited_states, visited, "/2", &path_to_goal); /* rule n->floor(n/2) */
-    fringe = insertValidSucc(fringe, value/3, visited_states, visited, "/3", &path_to_goal); /* rule n->floor(n/3) */
+    fringe = insertValidSucc(fringe, value+1, visited_states, visited, "+1"); /* rule n->n + 1      */
+    fringe = insertValidSucc(fringe, 2*value, visited_states, visited, "*2"); /* rule n->2*n        */
+    fringe = insertValidSucc(fringe, 3*value, visited_states, visited, "*3"); /* rule n->3*n        */
+    fringe = insertValidSucc(fringe, value-1, visited_states, visited, "-1"); /* rule n->n - 1      */
+    fringe = insertValidSucc(fringe, value/2, visited_states, visited, "/2"); /* rule n->floor(n/2) */
+    fringe = insertValidSucc(fringe, value/3, visited_states, visited, "/3"); /* rule n->floor(n/3) */
   }
   if (goalReached == 0) {
     printf("goal not reachable ");
   } else {
     printf("goal reached ");
-    printPath(path_to_goal);
   }
   printf("(%d nodes visited)\n", visited);
   showStats(fringe);

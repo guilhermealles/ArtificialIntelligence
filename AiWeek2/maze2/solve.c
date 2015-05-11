@@ -218,7 +218,7 @@ void solveMazeDLS(Maze *maze, int depth_limit, int *visit_count_ptr, int *push_c
     
     initPqueue(&visited);
     
-	while (!isEmptyPqueue(fringe) && !isSolved(*maze) && depth_count<depth_limit)
+	while (!isEmptyPqueue(fringe) && !isSolved(*maze))
 	{
 		depth_count++;
 		visitCount++;
@@ -237,7 +237,7 @@ void solveMazeDLS(Maze *maze, int depth_limit, int *visit_count_ptr, int *push_c
         		/* get new state (i.e. is a successor) */
 				getMazeState(&successor, *maze);
         		// If successor has not yet been visited, add it to the fringe. Otherwise, just ignore
-				if (existsInPqueue(visited, successor) == 0)
+				if (existsInPqueue(visited, successor) == 0 && successor.cost<depth_limit)
 				{
         			/* set priority of successor an put it in the fringe */
 					priority = getPqueueSize(fringe);
