@@ -89,12 +89,12 @@ Fringe insertFringe(Fringe fringe, State s, ...) {
     return fringe;
 }
 
-int getLowestPriorityIndex(Fringe fringe) {
-    int min_index=0, min_priority=0, i=0;
+int getHighestPriorityIndex(Fringe fringe) {
+    int max_index=0, max_priority=0, i=0;
     for (i=0; i<fringe.size; i++) {
-        if (fringe.priorities[i] < min_priority) {
-            min_priority = fringe.priorities[i];
-            min_index = i;
+        if (fringe.priorities[i] > max_priority) {
+            max_priority = fringe.priorities[i];
+            max_index = i;
         }
     }
     return i;
@@ -120,7 +120,7 @@ Fringe removeFringe(Fringe fringe, State *s) {
     }
     fringe.deleteCnt++;
     fringe.size--;
-    int lowest_priority_index;
+    int highest_priority_index;
     switch (fringe.mode) {
         case LIFO: /* LIFO == STACK */
         case STACK:
@@ -132,9 +132,9 @@ Fringe removeFringe(Fringe fringe, State *s) {
             break;
         case PRIO: /* PRIO == HEAP */
         case HEAP:
-            lowest_priority_index = getLowestPriorityIndex(fringe);
-            *s = fringe.states[lowest_priority_index];
-            defragFringe(fringe, lowest_priority_index);
+            highest_priority_index = getHighestPriorityIndex(fringe);
+            *s = fringe.states[highest_priority_index];
+            defragFringe(fringe, highest_priority_index);
             break;
     }
     return fringe;

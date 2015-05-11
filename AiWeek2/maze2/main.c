@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   Maze maze;
   Position pos, goal;
   
-  readMazeFromFile(&maze, "/Users/Alles/Development/XCode/ArtificialIntelligence/AiWeek2/maze2/maze3D.txt");
+  readMazeFromFile(&maze, "maze3D.txt");
 
   getPosition(maze, &pos);
   printf ("The initial position is ");
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
   printMaze(maze);
 
-  solveMazeIDA(maze);
+  solveMazeBFSNC(maze);
   
   return EXIT_SUCCESS;
 }
