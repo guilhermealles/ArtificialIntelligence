@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     
-    //fringetype = STACK;
+    fringetype = HEAP;
     start = 0;
     goal = 42;
     if (argc == 3) {
@@ -164,5 +164,6 @@ int main(int argc, char *argv[]) {
 
     printf("Problem: route from %d to %d\n", start, goal);
     search(fringetype, start, goal);
+    
     return EXIT_SUCCESS;
 }

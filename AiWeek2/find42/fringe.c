@@ -96,12 +96,12 @@ int getHighestPriorityIndex(Fringe fringe) {
             max_index = i;
         }
     }
-    return i;
+    return max_index;
 }
 
 Fringe defragFringe(Fringe fringe, int index) {
-    if (index < fringe.size-1) {
-        for (int i=index+1; i<fringe.size-1; i++) {
+    if (index < fringe.size) {
+        for (int i=index+1; i<fringe.size+1; i++) {
             fringe.states[i-1] = fringe.states[i];
             fringe.priorities[i-1] = fringe.priorities[i];
         }
@@ -133,7 +133,7 @@ Fringe removeFringe(Fringe fringe, State *s) {
         case HEAP:
             highest_priority_index = getHighestPriorityIndex(fringe);
             *s = fringe.states[highest_priority_index];
-            defragFringe(fringe, highest_priority_index);
+            fringe = defragFringe(fringe, highest_priority_index);
             break;
     }
     return fringe;
