@@ -22,7 +22,11 @@ int main(int argc, char *argv[]) {
 
   printMaze(maze);
 
+<<<<<<< Updated upstream
   solveMazeAstar(maze);
+=======
+  solveMazeIDA(maze);
+>>>>>>> Stashed changes
   
   return EXIT_SUCCESS;
 }
