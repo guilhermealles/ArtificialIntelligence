@@ -14,6 +14,8 @@
 
 int nqueens;      /* number of queens: global variable */
 int queens[MAXQ]; /* queen at (r,c) is represented by queens[r] == c */
+int nsuccessors;
+int successors[MAXQ][MAXQ];
 
 void initializeRandomGenerator() {
     /* this routine initializes the random generator. You are not
@@ -71,6 +73,22 @@ void printState() {
                 } else {
                     printf("q");
                 }
+            }
+        }
+        printf("\n");
+    }
+}
+
+/* print configuration on screen */
+void printCustomState(int *state) {
+    int row, column;
+    printf("\n");
+    for(row = 0; row < nqueens; row++) {
+        for(column = 0; column < nqueens; column++) {
+            if (state[row] != column) {
+                printf (".");
+            } else {
+                printf("q");
             }
         }
         printf("\n");
@@ -141,10 +159,17 @@ int evaluateState() {
     return (nqueens-1)*nqueens/2 - countConflicts();
 }
 
+void setState(int *state) {
+    int i;
+    for (i=0; i<nqueens; i++) {
+        queens[i]=state[i];
+    }
+}
+
 /*************************************************************/
 
 /* A very silly random search 'algorithm' */
-#define MAXITER 1000
+#define MAXITER 10000
 void randomSearch() {
     int queen, iter = 0;
     int optimum = (nqueens-1)*nqueens/2;
@@ -173,9 +198,78 @@ void randomSearch() {
 }
 
 /*************************************************************/
+void saveToSuccessors(int successor_index) {
+    int i;
+    for (i=0; i<nqueens; i++) {
+        successors[successor_index][i] = queens[i];
+    }
+}
+
+void generateSuccessors() {
+    nsuccessors = 0;
+    
+    int i=0;
+    for (i=0; i<nqueens; i++) {
+        int column=0;
+        for (column=0; column<nqueens; column++) {
+            if (queens[i] != column && canMoveTo(queens[i], column)) {
+                int queen_position = queens[i]; //Save current position to undo movement later
+                moveQueen(i, column);
+                saveToSuccessors(nsuccessors);
+                nsuccessors++;
+                // Undo move
+                moveQueen(i, queen_position);
+            }
+        }
+    }
+}
 
 void hillClimbing() {
-    printf("Implement the routine hillClimbing() yourself!!\n");
+    int optimum = (nqueens-1)*nqueens/2;
+    int iterations = 0;
+    
+    
+    while (iterations < MAXITER && evaluateState() != optimum) {
+        int best_successors_indices[MAXQ];
+        int best_successors_count = 0;
+        int best_successor_value = -999;
+        nsuccessors = 0;
+        
+        // Save current state
+        int current_state[10], i;
+        for (i=0; i<nqueens; i++) {
+            current_state[i] = queens[i];
+        }
+        
+        generateSuccessors();
+        for (i=0; i<nsuccessors; i++) {
+            setState(successors[i]);
+            if (evaluateState() > best_successor_value) {
+                best_successor_value = evaluateState();
+                best_successors_indices[0] = i;
+                best_successors_count = 1;
+            }
+            else if (evaluateState() == best_successor_value) {
+                best_successors_indices[best_successors_count] = i;
+                best_successors_count++;
+            }
+            setState(current_state);
+        }
+        
+        // Choose randomly between the best successors
+        int chosen_index = 0 + random() % (best_successors_count - 0);
+        setState(successors[chosen_index]);
+        
+        iterations++;
+    }
+    if (iterations < MAXITER) {
+        printf ("Solved puzzle.\n");
+        printf ("Final state is:\n\n");
+        printState();
+    }
+    else {
+        printf("Maximum number of iterations reached. Puzzle not solved.\n");
+    }
 }
 
 /*************************************************************/
@@ -204,7 +298,8 @@ int main(int argc, char *argv[]) {
     initiateQueens(1);
   
     printf("\nInitial state:");
-    printState(0);
+    printState();
+    
 
     switch (algorithm) {
         case 1: randomSearch();       break;
