@@ -152,7 +152,6 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     
-    fringetype = HEAP;
     start = 0;
     goal = 42;
     if (argc == 3) {

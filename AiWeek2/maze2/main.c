@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
   printMaze(maze);
 
-  solveMazeBFSNC(maze);
+  solveMazeAstar(maze);
   
   return EXIT_SUCCESS;
 }
