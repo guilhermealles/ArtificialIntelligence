@@ -161,7 +161,7 @@ int evaluateState() {
 }
 
 int evaluateState2(){
-    return ;
+    return - countConflicts();
 }
 
 void setState(int *state) {
