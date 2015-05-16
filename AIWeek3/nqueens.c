@@ -6,6 +6,7 @@
 #include <time.h>
 
 #define MAXQ 100
+#define MAXSECONDS 16000
 
 #define FALSE 0
 #define TRUE  1
@@ -159,6 +160,10 @@ int evaluateState() {
     return (nqueens-1)*nqueens/2 - countConflicts();
 }
 
+int evaluateState2(){
+    return ;
+}
+
 void setState(int *state) {
     int i;
     for (i=0; i<nqueens; i++) {
@@ -169,7 +174,7 @@ void setState(int *state) {
 /*************************************************************/
 
 /* A very silly random search 'algorithm' */
-#define MAXITER 10000
+#define MAXITER 2000000
 void randomSearch() {
     int queen, iter = 0;
     int optimum = (nqueens-1)*nqueens/2;
@@ -273,9 +278,96 @@ void hillClimbing() {
 }
 
 /*************************************************************/
+double timeToTemperature(double time)
+{
+    if (time == 0)
+    {
+        return 1000;
+    }
+    return (double)1/time;
+}
+
 
 void simulatedAnnealing() {
-    printf("Implement the routine simulatedAnnealing() yourself!!\n");
+    time_t start, end;
+    int optimum = (nqueens-1)*nqueens/2;
+    double seconds = 0;
+    double temperature = 0;
+    int iterations = 0;
+    int delta = 0;
+    int current_evaluation;
+    int successor_evaluation;
+    double probability;
+    double rand;
+    
+    // Starts the counter
+    time(&start);
+    
+    // Save current state
+    int current_state[10], i;
+    for (i=0; i<nqueens; i++) {
+        current_state[i] = queens[i];
+    }
+    generateSuccessors();
+    
+    while(iterations < MAXITER && evaluateState() != optimum)
+    {
+        setState(current_state);
+        current_evaluation = evaluateState();
+        
+        time(&end);
+        seconds = difftime(end, start);
+        temperature = timeToTemperature(seconds);
+        
+        if (temperature < 0.0001)
+        {
+            printf("Final state is:\n\n");
+            printState();
+            break;
+        }
+        
+        // Choose randomly between the best successors
+        int chosen_index = 0 + random() % (nsuccessors - 0);
+        setState(successors[chosen_index]);
+        successor_evaluation = evaluateState();
+        
+        delta = successor_evaluation - current_evaluation;
+        probability =  exp(delta/temperature);
+        rand = random() % 100;
+        
+        if (delta > 0)
+        {
+            // Update current state to next state
+            for (i = 0; i < nqueens; i++)
+            {
+                current_state[i] = queens[i];
+            }
+        }
+        else
+        {
+            if (rand < probability)
+            {
+                // Update current state to next state
+                for (i = 0; i < nqueens; i++)
+                {
+                    current_state[i] = queens[i];
+                }
+            }
+          
+        }
+        
+        iterations++;
+    }
+    if (iterations < MAXITER) {
+        printf ("Solved puzzle.\n");
+        printf ("Final state is:\n\n");
+        printState();
+        getchar();
+    }
+    else {
+        printf("Maximum number of iterations reached. Puzzle not solved.\n");
+    }
+
 }
 
 
@@ -299,12 +391,19 @@ int main(int argc, char *argv[]) {
   
     printf("\nInitial state:");
     printState();
-    
+    int i=0;
 
     switch (algorithm) {
         case 1: randomSearch();       break;
         case 2: hillClimbing();       break;
-        case 3: simulatedAnnealing(); break;
+        case 3:
+            for(i = 0; i < 10000; i++)
+            {
+                initiateQueens(1);
+                simulatedAnnealing();
+            }
+            
+            break;
     }
 
     return 0;  
