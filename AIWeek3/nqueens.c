@@ -174,7 +174,7 @@ void setState(int *state) {
 /*************************************************************/
 
 /* A very silly random search 'algorithm' */
-#define MAXITER 2000000
+#define MAXITER 10000
 void randomSearch() {
     int queen, iter = 0;
     int optimum = (nqueens-1)*nqueens/2;
@@ -395,7 +395,12 @@ int main(int argc, char *argv[]) {
 
     switch (algorithm) {
         case 1: randomSearch();       break;
-        case 2: hillClimbing();       break;
+        case 2:
+            for (i=0; i<10000; i++) {
+                initiateQueens(1);
+                hillClimbing();
+            }
+            break;
         case 3:
             for(i = 0; i < 10000; i++)
             {
