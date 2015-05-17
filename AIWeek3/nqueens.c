@@ -174,11 +174,7 @@ void setState(int *state) {
 /*************************************************************/
 
 /* A very silly random search 'algorithm' */
-<<<<<<< Updated upstream
 #define MAXITER 10000
-=======
-#define MAXITER 1000000
->>>>>>> Stashed changes
 void randomSearch() {
     int queen, iter = 0;
     int optimum = (nqueens-1)*nqueens/2;
