@@ -265,6 +265,18 @@ int populationHasSolution() {
 	return FALSE;
 }
 
+void printSolutionFromPopulation() {
+	int solution = (nqueens-1)*nqueens/2;
+	int i;
+	for (i=0; i<POPULATION_COUNT; i++) {
+		setBuffer(current_population[i]);
+		if (evaluateBuffer() == solution) {
+			printState();
+			return;
+		}
+	}
+}
+
 void printCurrentPopulation() {
 	int i;
 	for (i=0; i<POPULATION_COUNT; i++) {
@@ -292,7 +304,8 @@ void geneticAlgorithm() {
 		selectNewPopulation();
 		
 		if (populationHasSolution()) {
-			printf("Found a solution in generation %d\n", generation_count);
+			printf("Found a solution in generation %d:\n", generation_count);
+			printSolutionFromPopulation();
 			return;
 		}
 		else {
