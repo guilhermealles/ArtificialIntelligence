@@ -22,7 +22,7 @@ int nqueens;      /* number of queens */
 int queens_buffer[MAXQ]; /* queen at (r,c) is represented by queens[r] == c */
 
 int current_population[POPULATION_COUNT][MAXQ];
-int next_generation[(POPULATION_COUNT-1)*3*2][MAXQ]; //Next generation has size (POPULATION_COUNT-1)!;
+int next_generation[NEXT_GEN_COUNT][MAXQ]; //Next generation has size (POPULATION_COUNT-1)!;
 
 void initializeRandomGenerator() {
     time_t t;
@@ -183,20 +183,27 @@ void selectNewPopulation() {
 	int current_evaluation = -999;
 	int last_children_evaluation = 999;
 	
-	// Select the POPULATION_COUNT best children from next generation
+	// Select the POPULATION_COUNT-1 best children from next generation. The last children will be chosen randomly
 	while (best_children_count < POPULATION_COUNT) {
 		current_evaluation = -999;
-		int i, chosen_index=0;
-		for (i=0; i<NEXT_GEN_COUNT; i++) {
-			setBuffer(next_generation[i]);
-			if ((evaluateBuffer() > current_evaluation) && (evaluateBuffer() < last_children_evaluation)) {
-				current_evaluation = evaluateBuffer();
-				chosen_index = i;
-			}
+		if (best_children_count == POPULATION_COUNT-1) {
+			int random_index = 0 + rand() % (0+POPULATION_COUNT);
+			best_children_indices[best_children_count] = random_index;
+			best_children_count++;
 		}
-		last_children_evaluation = current_evaluation;
-		best_children_indices[best_children_count] = chosen_index;
-		best_children_count++;
+		else {
+			int i, chosen_index=0;
+			for (i=0; i<NEXT_GEN_COUNT; i++) {
+				setBuffer(next_generation[i]);
+				if ((evaluateBuffer() > current_evaluation) && (evaluateBuffer() < last_children_evaluation)) {
+					current_evaluation = evaluateBuffer();
+					chosen_index = i;
+				}
+			}
+			last_children_evaluation = current_evaluation;
+			best_children_indices[best_children_count] = chosen_index;
+			best_children_count++;
+		}
 	}
 	
 	// Add the new selected children to the population
@@ -221,10 +228,10 @@ void mutateWithProbability(int children_index) {
 
 void haveSex(int father_index, int mother_index, int children_index) {
 	// Choose a random value for the percentage of information from each parent. If the value is 3, the first 3 rows of the children will be the same as the father, while the remaining will be the same as the mother.
-	int parenthood_percentage = 0 + random()%(nqueens-0);
+	int cross_over_point = 0 + random()%(nqueens-0);
 	int i;
 	
-	for (i=0; i<parenthood_percentage; i++) {
+	for (i=0; i<cross_over_point; i++) {
 		// Get the value from the father
 		next_generation[children_index][i] = current_population[father_index][i];
 	}
@@ -275,7 +282,7 @@ void geneticAlgorithm() {
 	// Initializes the population
 	int i;
 	for (i=0; i<POPULATION_COUNT; i++) {
-		initiateQueens(1);
+		initiateQueens(0);
 		addBufferToPopulation(i);
 	}
 	
@@ -286,7 +293,7 @@ void geneticAlgorithm() {
 		
 		if (populationHasSolution()) {
 			printf("Found a solution in generation %d\n", generation_count);
-			getchar();
+			return;
 		}
 		else {
 			//printf("Current generation #: %d\n", generation_count);
@@ -302,6 +309,8 @@ int main (int argc, char **argv) {
     } while ((nqueens < 1) || (nqueens > MAXQ));
     
     initializeRandomGenerator();
-    
-	geneticAlgorithm();
+	
+	for (int i=0; i<10; i++) {
+		geneticAlgorithm();
+	}
 }
