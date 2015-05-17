@@ -174,7 +174,13 @@ void setState(int *state) {
 /*************************************************************/
 
 /* A very silly random search 'algorithm' */
+<<<<<<< Updated upstream
 #define MAXITER 10000
+=======
+
+#define MAXITER 50000
+
+>>>>>>> Stashed changes
 void randomSearch() {
     int queen, iter = 0;
     int optimum = (nqueens-1)*nqueens/2;
@@ -280,11 +286,15 @@ void hillClimbing() {
 /*************************************************************/
 double timeToTemperature(double time)
 {
+    
     if (time == 0)
     {
         return 1000;
     }
     return (double)1/time;
+     
+    
+    //return MAXITER - time*2;
 }
 
 
@@ -326,7 +336,8 @@ void simulatedAnnealing() {
             break;
         }
         
-        // Choose randomly between the best successors
+        // Choose randomly between the successors
+        generateSuccessors();
         int chosen_index = 0 + random() % (nsuccessors - 0);
         setState(successors[chosen_index]);
         successor_evaluation = evaluateState();
