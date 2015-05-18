@@ -8,15 +8,21 @@
 #define MAXQ 100
 #define MAXSECONDS 16000
 
+#define POPULATION_COUNT 5
+#define NEXT_GEN_COUNT 4*3*2*1 //(POPULATION_COUNT-1)!
+
 #define FALSE 0
 #define TRUE  1
 
 #define ABS(a) ((a) < 0 ? (-(a)) : (a))
 
 int nqueens;      /* number of queens: global variable */
-int queens[MAXQ]; /* queen at (r,c) is represented by queens[r] == c */
+int queens_buffer[MAXQ]; /* queen at (r,c) is represented by queens[r] == c */
 int nsuccessors;
 int successors[MAXQ][MAXQ];
+
+int current_population[POPULATION_COUNT][MAXQ];
+int next_generation[NEXT_GEN_COUNT][MAXQ]; //Next generation has size (POPULATION_COUNT-1)!;
 
 void initializeRandomGenerator() {
     /* this routine initializes the random generator. You are not
@@ -33,7 +39,7 @@ void initializeRandomGenerator() {
 void initiateQueens(int flag) {
     int q;
     for (q = 0; q < nqueens; q++) {
-        queens[q] = (flag == 0? 0 : random()%nqueens);
+        queens_buffer[q] = (flag == 0? 0 : random()%nqueens);
     }
 }
 
@@ -53,8 +59,8 @@ int inConflict(int row0, int column0, int row1, int column1) {
 int inConflictWithAnotherQueen(int row, int col) {
     int queen;
     for (queen=0; queen < nqueens; queen++) {
-        if (inConflict(row, col, queen, queens[queen])) {
-            if ((row != queen) || (col != queens[queen])) return TRUE;
+        if (inConflict(row, col, queen, queens_buffer[queen])) {
+            if ((row != queen) || (col != queens_buffer[queen])) return TRUE;
         }
     }
     return FALSE;
@@ -66,7 +72,7 @@ void printState() {
     printf("\n");
     for(row = 0; row < nqueens; row++) {
         for(column = 0; column < nqueens; column++) {
-            if (queens[row] != column) {
+            if (queens_buffer[row] != column) {
                 printf (".");
             } else {
                 if (inConflictWithAnotherQueen(row, column)) {
@@ -89,7 +95,7 @@ void printCustomState(int *state) {
             if (state[row] != column) {
                 printf (".");
             } else {
-                printf("q");
+                printf("o");
             }
         }
         printf("\n");
@@ -108,7 +114,7 @@ void moveQueen(int queen, int column) {
                 "(should be 0<=column<%d)...Abort.\n", column, nqueens);
         exit(-1);
     }
-    queens[queen] = column;
+    queens_buffer[queen] = column;
 }
 
 /* returns TRUE if queen can be moved to position
@@ -123,7 +129,7 @@ int canMoveTo(int queen, int column) {
         exit(-1);
     }
     if(column < 0 || column >= nqueens) return FALSE;
-    if (queens[queen] == column) return FALSE; /* queen already there */
+    if (queens_buffer[queen] == column) return FALSE; /* queen already there */
     return TRUE;
 }
 
@@ -134,7 +140,7 @@ int columnOfQueen(int queen) {
                 "(should be 0<=queen<%d)...Abort.\n", queen, nqueens);
         exit(-1);
     }
-    return queens[queen];
+    return queens_buffer[queen];
 }
 
 /* returns the number of pairs of queens that are in conflict */
@@ -143,7 +149,7 @@ int countConflicts() {
     int queen, other;
     for (queen=0; queen < nqueens; queen++) {
         for (other=queen+1; other < nqueens; other++) {
-            if (inConflict(queen, queens[queen], other, queens[other])) {
+            if (inConflict(queen, queens_buffer[queen], other, queens_buffer[other])) {
                 cnt++;
             }
         }
@@ -156,7 +162,7 @@ int countConflicts() {
  * Since we want to do ascending local searches, the evaluation
  * function returns (nqueens-1)*nqueens/2 - countConflicts().
  */
-int evaluateState() {
+int evaluateBuffer() {
     return (nqueens-1)*nqueens/2 - countConflicts();
 }
 
@@ -164,23 +170,175 @@ int evaluateState2(){
     return - countConflicts();
 }
 
-void setState(int *state) {
+void setBuffer(int *state) {
     int i;
     for (i=0; i<nqueens; i++) {
-        queens[i]=state[i];
+        queens_buffer[i]=state[i];
     }
 }
+
+/************************************************************/
+// Genetic Algorithm code
+
+void addBufferToPopulation(int population_index) {
+    if (population_index < POPULATION_COUNT) {
+        int i;
+        for (i=0; i<nqueens; i++) {
+            current_population[population_index][i] = queens_buffer[i];
+        }
+    }
+}
+
+// Evaluates the next generation and chooses the best children to be the new population
+void selectNewPopulation() {
+    int best_children_indices[POPULATION_COUNT];
+    int best_children_count = 0;
+    int current_evaluation = -999;
+    int last_children_evaluation = 999;
+    
+    // Select the POPULATION_COUNT-1 best children from next generation. The last children will be chosen randomly
+    while (best_children_count < POPULATION_COUNT) {
+        current_evaluation = -999;
+        if (best_children_count == POPULATION_COUNT-1) {
+            int random_index = 0 + rand() % (0+POPULATION_COUNT);
+            best_children_indices[best_children_count] = random_index;
+            best_children_count++;
+        }
+        else {
+            int i, chosen_index=0;
+            for (i=0; i<NEXT_GEN_COUNT; i++) {
+                setBuffer(next_generation[i]);
+                if ((evaluateBuffer() > current_evaluation) && (evaluateBuffer() < last_children_evaluation)) {
+                    current_evaluation = evaluateBuffer();
+                    chosen_index = i;
+                }
+            }
+            last_children_evaluation = current_evaluation;
+            best_children_indices[best_children_count] = chosen_index;
+            best_children_count++;
+        }
+    }
+    
+    // Add the new selected children to the population
+    int i;
+    for (i=0; i<POPULATION_COUNT; i++) {
+        setBuffer(next_generation[best_children_indices[i]]);
+        addBufferToPopulation(i);
+    }
+}
+
+void mutateWithProbability(int children_index) {
+    int probability = 0 + rand() % (100 - 0);
+    
+    // Mutation happens with probability of 1%
+    if (probability <= 1) {
+        int random_index = 0 + rand() % (nqueens - 0);
+        int random_value = 0 + rand() % (nqueens - 0);
+        
+        next_generation[children_index][random_index] = random_value;
+    }
+}
+
+void crossOver(int father_index, int mother_index, int children_index) {
+    // Choose a random value for the percentage of information from each parent. If the value is 3, the first 3 rows of the children will be the same as the father, while the remaining will be the same as the mother.
+    int cross_over_point = 0 + random()%(nqueens-0);
+    int i;
+    
+    for (i=0; i<cross_over_point; i++) {
+        // Get the value from the father
+        next_generation[children_index][i] = current_population[father_index][i];
+    }
+    for (; i<nqueens; i++) {
+        // Get the value from the mother
+        next_generation[children_index][i] = current_population[mother_index][i];
+    }
+    
+    mutateWithProbability(children_index);
+}
+
+void multipleCrossOver() {
+    int i, j, children_index=0;
+    for (i=0; i<POPULATION_COUNT; i++) {
+        for (j=i; j<POPULATION_COUNT; j++) {
+            crossOver(i, j, children_index);
+            children_index++;
+        }
+    }
+}
+
+int populationHasSolution() {
+    int solution = (nqueens-1)*nqueens/2;
+    int i;
+    for (i=0; i<POPULATION_COUNT; i++) {
+        setBuffer(current_population[i]);
+        if (evaluateBuffer() == solution) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+void printSolutionFromPopulation() {
+    int solution = (nqueens-1)*nqueens/2;
+    int i;
+    for (i=0; i<POPULATION_COUNT; i++) {
+        setBuffer(current_population[i]);
+        if (evaluateBuffer() == solution) {
+            printState();
+            return;
+        }
+    }
+}
+
+void printCurrentPopulation() {
+    int i;
+    for (i=0; i<POPULATION_COUNT; i++) {
+        int j;
+        for (j=0; j<nqueens; j++) {
+            printf("%d ", current_population[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void geneticAlgorithm() {
+    int generation_count = 0;
+    
+    // Initializes the population
+    int i;
+    for (i=0; i<POPULATION_COUNT; i++) {
+        initiateQueens(0);
+        addBufferToPopulation(i);
+    }
+    
+    while (TRUE) {
+        generation_count++;
+        multipleCrossOver();
+        selectNewPopulation();
+        
+        if (populationHasSolution()) {
+            printf("Found a solution in generation %d:\n", generation_count);
+            printSolutionFromPopulation();
+            return;
+        }
+        else {
+            //printf("Current generation #: %d\n", generation_count);
+        }
+    }
+}
+
+
 
 /*************************************************************/
 
 /* A very silly random search 'algorithm' */
-#define MAXITER 1000000000
+#define MAXITER 100000
 void randomSearch() {
     int queen, iter = 0;
     int optimum = (nqueens-1)*nqueens/2;
 
-    while (evaluateState() != optimum) {
-        printf("iteration %d: evaluation=%d\n", iter++, evaluateState());
+    while (evaluateBuffer() != optimum) {
+        printf("iteration %d: evaluation=%d\n", iter++, evaluateBuffer());
         if (iter == MAXITER) break;  /* give up */
         /* generate a (new) random state: for each queen do ...*/
         for (queen=0; queen < nqueens; queen++) {
@@ -206,7 +364,7 @@ void randomSearch() {
 void saveToSuccessors(int successor_index) {
     int i;
     for (i=0; i<nqueens; i++) {
-        successors[successor_index][i] = queens[i];
+        successors[successor_index][i] = queens_buffer[i];
     }
 }
 
@@ -217,8 +375,8 @@ void generateSuccessors() {
     for (i=0; i<nqueens; i++) {
         int column=0;
         for (column=0; column<nqueens; column++) {
-            if (queens[i] != column && canMoveTo(queens[i], column)) {
-                int queen_position = queens[i]; //Save current position to undo movement later
+            if (queens_buffer[i] != column && canMoveTo(queens_buffer[i], column)) {
+                int queen_position = queens_buffer[i]; //Save current position to undo movement later
                 moveQueen(i, column);
                 saveToSuccessors(nsuccessors);
                 nsuccessors++;
@@ -234,7 +392,7 @@ void hillClimbing() {
     int iterations = 0;
     
     
-    while (iterations < MAXITER && evaluateState() != optimum) {
+    while (iterations < MAXITER && evaluateBuffer() != optimum) {
         int best_successors_indices[MAXQ];
         int best_successors_count = 0;
         int best_successor_value = -999;
@@ -243,27 +401,27 @@ void hillClimbing() {
         // Save current state
         int current_state[10], i;
         for (i=0; i<nqueens; i++) {
-            current_state[i] = queens[i];
+            current_state[i] = queens_buffer[i];
         }
         
         generateSuccessors();
         for (i=0; i<nsuccessors; i++) {
-            setState(successors[i]);
-            if (evaluateState() > best_successor_value) {
-                best_successor_value = evaluateState();
+            setBuffer(successors[i]);
+            if (evaluateBuffer() > best_successor_value) {
+                best_successor_value = evaluateBuffer();
                 best_successors_indices[0] = i;
                 best_successors_count = 1;
             }
-            else if (evaluateState() == best_successor_value) {
+            else if (evaluateBuffer() == best_successor_value) {
                 best_successors_indices[best_successors_count] = i;
                 best_successors_count++;
             }
-            setState(current_state);
+            setBuffer(current_state);
         }
         
         // Choose randomly between the best successors
         int chosen_index = 0 + random() % (best_successors_count - 0);
-        setState(successors[chosen_index]);
+        setBuffer(successors[chosen_index]);
         
         iterations++;
     }
@@ -290,7 +448,7 @@ double timeToTemperatureLinear(double temperature) {
     if (temperature > 11)
         return temperature -1;
     else
-        return temperature - 0.0001;
+        return temperature - 0.01;
 }
 
 void simulatedAnnealing() {
@@ -311,13 +469,13 @@ void simulatedAnnealing() {
     // Save current state
     int current_state[MAXQ], i;
     for (i=0; i<nqueens; i++) {
-        current_state[i] = queens[i];
+        current_state[i] = queens_buffer[i];
     }
     
-    while(iterations < MAXITER && evaluateState() != optimum && temperature > 0.00001)
+    while(iterations < MAXITER && evaluateBuffer() != optimum && temperature > 0.00001)
     {
-        setState(current_state);
-        current_evaluation = evaluateState();
+        setBuffer(current_state);
+        current_evaluation = evaluateBuffer();
         
         clock_end = clock();
         clock_time = clock_end - clock_start;
@@ -328,8 +486,8 @@ void simulatedAnnealing() {
         
         // Choose randomly between the successors
         int chosen_index = 0 + random() % (nsuccessors - 0);
-        setState(successors[chosen_index]);
-        successor_evaluation = evaluateState();
+        setBuffer(successors[chosen_index]);
+        successor_evaluation = evaluateBuffer();
         
         delta = successor_evaluation - current_evaluation;
         
@@ -340,7 +498,7 @@ void simulatedAnnealing() {
             {
                 current_state[i] = successors[chosen_index][i];
             }
-            setState(current_state);
+            setBuffer(current_state);
         }
         else
         {
@@ -355,13 +513,13 @@ void simulatedAnnealing() {
                 {
                     current_state[i] = successors[chosen_index][i];
                 }
-                setState(current_state);
+                setBuffer(current_state);
             }
         }
         iterations++;
-        printf("Current state evaluation: %d, Temperature: %f, Probability: %f\n", evaluateState(), temperature, probability);
+        printf("Current state evaluation: %d, Temperature: %f, Probability: %f\n", evaluateBuffer(), temperature, probability);
     }
-    if (iterations < MAXITER && evaluateState() == optimum) {
+    if (iterations < MAXITER && evaluateBuffer() == optimum) {
         printf ("Solved puzzle.\n");
         printf ("Final state is:\n\n");
         printState();
@@ -374,49 +532,52 @@ void simulatedAnnealing() {
 
 void simulatedAnnealing2() {
     int optimum = (nqueens-1)*nqueens/2;
+    int iterations = 0;
     double temperature = 100;
     
-    while (evaluateState() != optimum && temperature > 0.1) {
+    while (iterations < MAXITER && evaluateBuffer() != optimum && temperature > 0.0001) {
         generateSuccessors();
         
         // Save current state
-        int current_evaluation = evaluateState();
+        int current_evaluation = evaluateBuffer();
         int current_state[nqueens], i;
         for (i=0; i<nqueens; i++) {
-            current_state[i] = queens[i];
+            current_state[i] = queens_buffer[i];
         }
         
         // Get a random successor
         int random_successor_index = random() % nqueens;
-        setState(successors[random_successor_index]);
-        int successor_evaluation = evaluateState();
+        setBuffer(successors[random_successor_index]);
+        int successor_evaluation = evaluateBuffer();
         
         int delta = successor_evaluation - current_evaluation;
         if (delta > 0) {
-            setState(successors[random_successor_index]);
+            setBuffer(successors[random_successor_index]);
         }
         else {
             temperature = timeToTemperatureLinear(temperature);
             double probability_of_change = exp(delta/temperature);
             double random_number = (rand() % 100) / (double)100;
-            printf("Bad move: ");
+            //printf("Bad move: ");
             if (random_number < probability_of_change) {
-                setState(successors[random_successor_index]);
-                printf("done. Probability: %.2f. ", probability_of_change);
+                setBuffer(successors[random_successor_index]);
+                //printf("done. Probability: %.2f. ", probability_of_change);
             }
             else { // Else, revert state to the original one
-                setState(current_state);
-                printf("NOT done. Probability: %.2f. ", probability_of_change);
+                setBuffer(current_state);
+                //printf("NOT done. Probability: %.2f. ", probability_of_change);
             }
         }
-        printf("Temperature: %.4f\tEvaluation: %d/%d\n", temperature, evaluateState(), optimum);
+        //printf("Temperature: %.4f\tEvaluation: %d/%d\n", temperature, evaluateState(), optimum);
+        iterations++;
     }
-    if (evaluateState() == optimum) {
+    if (evaluateBuffer() == optimum) {
         printf ("Solved puzzle.\n");
         printf ("Final state is:\n\n");
         printState();
-        fflush(stdin);
-        getchar();
+    }
+    else {
+        printf("Not solved in this iteration.\n");
     }
 }
 
@@ -431,34 +592,36 @@ int main(int argc, char *argv[]) {
 
     do {
         printf ("Algorithm: (1) Random search  (2) Hill climbing  ");
-        printf ("(3) Simulated Annealing: ");
+        printf ("(3) Simulated Annealing  (4) Genetic Algorithm: ");
         scanf ("%d", &algorithm);
-    } while ((algorithm < 1) || (algorithm > 3));
+    } while ((algorithm < 1) || (algorithm > 4));
   
     initializeRandomGenerator();
 
-    initiateQueens(1);
+    //initiateQueens(1);
     
-    printf("\nInitial state:");
-    printState();
+    //printf("\nInitial state:");
+    //printState();
     int i=0;
 
     switch (algorithm) {
         case 1: randomSearch();       break;
         case 2:
-            for (i=0; i<10000; i++) {
+            for (i=0; i<100; i++) {
                 initiateQueens(1);
                 hillClimbing();
             }
             break;
         case 3:
-            for(i = 0; i < 1; i++)
+            for(i = 0; i < 100; i++)
             {
                 initiateQueens(1);
                 simulatedAnnealing2();
             }
-            
             break;
+        case 4:
+            initiateQueens(1);
+            geneticAlgorithm();
     }
 
     return 0;  
