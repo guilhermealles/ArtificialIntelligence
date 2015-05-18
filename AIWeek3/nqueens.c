@@ -304,7 +304,6 @@ void geneticAlgorithm() {
 
 
 /*************************************************************/
-
 /* A very silly random search 'algorithm' */
 void randomSearch() {
     int queen, iter = 0;
@@ -354,6 +353,7 @@ void hillClimbing() {
         int best_move_evaluation = evaluateBuffer(); // Value to be maximized. Initialize with the current evaluation.
         nsuccessors = 0;
         
+        // Loops through all possible moves
         int i, j;
         for (i=0; i<nqueens; i++) {
             for (j=0; j<nqueens; j++) {
@@ -374,6 +374,7 @@ void hillClimbing() {
             }
         }
         
+        // Select randomly the best successor
         if (nsuccessors != 0) {
             int random_successor = rand() % nsuccessors;
             setBuffer(successors[random_successor]);
@@ -393,7 +394,7 @@ void hillClimbing() {
         solutions_found++;
     }
     else {
-        printf("Puzzle not solved. Final state:\n");
+        printf("Puzzle not solved (maximum number of iterations). Final state:\n");
         printState();
     }
 }
