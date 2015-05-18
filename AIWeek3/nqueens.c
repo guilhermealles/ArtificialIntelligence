@@ -93,22 +93,6 @@ void printState() {
     }
 }
 
-/* print configuration on screen */
-void printCustomState(int *state) {
-    int row, column;
-    printf("\n");
-    for(row = 0; row < nqueens; row++) {
-        for(column = 0; column < nqueens; column++) {
-            if (state[row] != column) {
-                printf (".");
-            } else {
-                printf("o");
-            }
-        }
-        printf("\n");
-    }
-}
-
 /* move queen on row q to specified column, i.e. to (q,column) */
 void moveQueen(int queen, int column) {
     if ((queen < 0) || (queen >= nqueens)) {
@@ -171,10 +155,6 @@ int countConflicts() {
  */
 int evaluateBuffer() {
     return (nqueens-1)*nqueens/2 - countConflicts();
-}
-
-int evaluateState2(){
-    return - countConflicts();
 }
 
 void setBuffer(int *state) {
@@ -313,12 +293,10 @@ void geneticAlgorithm() {
         selectNewPopulation();
         
         if (populationHasSolution()) {
-            printf("Found a solution in generation %d:\n", generation_count);
+            printf("Found a solution in generation %d.\n", generation_count);
+            printf("Solution:");
             printSolutionFromPopulation();
             return;
-        }
-        else {
-            //printf("Current generation #: %d\n", generation_count);
         }
     }
 }
@@ -360,25 +338,6 @@ void saveToSuccessors(int successor_index) {
     int i;
     for (i=0; i<nqueens; i++) {
         successors[successor_index][i] = queens_buffer[i];
-    }
-}
-
-void generateSuccessors() {
-    nsuccessors = 0;
-    
-    int i=0;
-    for (i=0; i<nqueens; i++) {
-        int column=0;
-        for (column=0; column<nqueens; column++) {
-            if (queens_buffer[i] != column && canMoveTo(queens_buffer[i], column)) {
-                int queen_position = queens_buffer[i]; //Save current position to undo movement later
-                moveQueen(i, column);
-                saveToSuccessors(nsuccessors);
-                nsuccessors++;
-                // Undo move
-                moveQueen(i, queen_position);
-            }
-        }
     }
 }
 
@@ -427,7 +386,6 @@ void hillClimbing() {
         
         iterations++;
     }
-    
     if (evaluateBuffer() == optimum) {
         printf ("Solved puzzle.\n");
         printf ("Solution:");
@@ -441,8 +399,7 @@ void hillClimbing() {
 }
 
 /*************************************************************/
-double timeToTemperature(clock_t clock_start)
-{
+double timeToTemperature(clock_t clock_start) {
     clock_t clock_end = clock();
     long int clock_diff = clock_end - clock_start;
     if (clock_diff == 0) {
@@ -452,89 +409,7 @@ double timeToTemperature(clock_t clock_start)
     return INITIAL_TEMPERATURE - ((double)clock_diff/((double)CLOCKS_PER_SEC));
 }
 
-double timeToTemperatureLinear(double temperature) {
-        return temperature * TEMPERATURE_DECREASING_FACTOR;
-}
-
 void simulatedAnnealing() {
-    clock_t clock_start, clock_end;
-    int optimum = (nqueens-1)*nqueens/2;
-    double clock_time = 0;
-    double temperature = 100;
-    int iterations = 0;
-    int delta = 0;
-    int current_evaluation;
-    int successor_evaluation;
-    double probability=100;
-    double rand;
-    
-    // Starts the counter
-    clock_start = clock();
-    
-    // Save current state
-    int current_state[MAXQ], i;
-    for (i=0; i<nqueens; i++) {
-        current_state[i] = queens_buffer[i];
-    }
-    
-    while(evaluateBuffer() != optimum && temperature > 0.001)
-    {
-        setBuffer(current_state);
-        current_evaluation = evaluateBuffer();
-        
-        clock_end = clock();
-        clock_time = clock_end - clock_start;
-        temperature = timeToTemperature(clock_start);
-        //printf("%f\n", temperature);
-        
-        generateSuccessors();
-        
-        // Choose randomly between the successors
-        int chosen_index = 0 + random() % (nsuccessors - 0);
-        setBuffer(successors[chosen_index]);
-        successor_evaluation = evaluateBuffer();
-        
-        delta = successor_evaluation - current_evaluation;
-        
-        // If the move is better
-        if (delta > 0)
-        {
-            // Update current state to next state
-            for (i = 0; i < nqueens; i++)
-            {
-                current_state[i] = successors[chosen_index][i];
-            }
-            setBuffer(current_state);
-        }
-        else
-        {
-            probability =  exp(delta/temperature);
-            rand = (double)((random() % 100)/(double)100);
-            if (rand < probability)
-            {
-                // Update current state to next state
-                for (i = 0; i < nqueens; i++)
-                {
-                    current_state[i] = successors[chosen_index][i];
-                }
-                setBuffer(current_state);
-            }
-        }
-        iterations++;
-        printf("Current state evaluation: %d, Temperature: %f, Probability: %f\n", evaluateBuffer(), temperature, probability);
-    }
-    if (iterations < MAXITER && evaluateBuffer() == optimum) {
-        printf ("Solved puzzle.\n");
-        printf ("Final state is:\n\n");
-        printState();
-        solutions_found++;
-    }
-    else {
-        printf("Maximum number of iterations reached. Puzzle not solved.\n");
-    }
-}
-
-void simulatedAnnealing2() {
     clock_t clock_start;
     int optimum = (nqueens-1)*nqueens/2;
     int iterations = 0;
@@ -591,7 +466,7 @@ void simulatedAnnealing2() {
 
 
 int main(int argc, char *argv[]) {
-    int algorithm;
+    int algorithm, times_to_execute=1;
 
     do {
         printf ("Number of queens (1<=nqueens<%d): ", MAXQ);
@@ -603,20 +478,22 @@ int main(int argc, char *argv[]) {
         printf ("(3) Simulated Annealing  (4) Genetic Algorithm: ");
         scanf ("%d", &algorithm);
     } while ((algorithm < 1) || (algorithm > 4));
+    
+    if (algorithm != 4) {
+        do {
+            printf("How many times to execute? (1<n<10000):");
+            scanf("%d", &times_to_execute);
+        } while ((times_to_execute < 1 || times_to_execute > 10000));
+    }
   
     initializeRandomGenerator();
-
-    //initiateQueens(1);
     
-    //printf("\nInitial state:");
-    //printState();
     int i=0;
-
     switch (algorithm) {
         case 1: randomSearch();       break;
         case 2:
             solutions_found = 0;
-            for (i=0; i<1000; i++) {
+            for (i=0; i<times_to_execute; i++) {
                 initiateQueens(1);
                 hillClimbing();
             }
@@ -624,10 +501,10 @@ int main(int argc, char *argv[]) {
             break;
         case 3:
             solutions_found = 0;
-            for(i = 0; i < 10; i++)
+            for(i = 0; i < times_to_execute; i++)
             {
                 initiateQueens(1);
-                simulatedAnnealing2();
+                simulatedAnnealing();
             }
             printf("Algorithm finished. Found a solution in %d out of %d executions.\n", solutions_found, i);
             break;
