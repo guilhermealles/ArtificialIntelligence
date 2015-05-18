@@ -23,7 +23,7 @@
 int nqueens;      /* number of queens: global variable */
 int queens_buffer[MAXQ]; /* queen at (r,c) is represented by queens[r] == c */
 int nsuccessors;
-int successors[MAXQ][MAXQ];
+int successors[MAXQ*MAXQ][MAXQ];
 
 int current_population[POPULATION_COUNT][MAXQ];
 int next_generation[NEXT_GEN_COUNT][MAXQ]; //Next generation has size (POPULATION_COUNT-1)!;
@@ -381,131 +381,62 @@ void generateSuccessors() {
     }
 }
 
-void generateBetterEqualSuccessors() {
-    nsuccessors = 0;
-    int current_evaluation = evaluateBuffer();
+void hillClimbing2() {
+    int iterations = 0;
+    int optimum = (nqueens-1)*nqueens/2;
     
-    int i=0;
+    int current_state[nqueens], i;
     for (i=0; i<nqueens; i++) {
-        int column=0;
-        for (column=0; column<nqueens; column++) {
-            if (queens_buffer[i] != column) {
-                int queen_position = queens_buffer[i];
-                moveQueen(i, column);
-                if (evaluateBuffer() >= current_evaluation) {
+        current_state[i] = queens_buffer[i];
+    }
+    
+    while ((iterations < MAXITER) && (evaluateBuffer() != optimum)) {
+        int best_move_evaluation = evaluateBuffer(); // Value to be maximized. Initialize with the current evaluation.
+        nsuccessors = 0;
+        
+        int i, j;
+        for (i=0; i<nqueens; i++) {
+            for (j=0; j<nqueens; j++) {
+                moveQueen(i,j);
+                int successor_evaluation = evaluateBuffer();
+                if (successor_evaluation > best_move_evaluation) {
+                    saveToSuccessors(0);
+                    nsuccessors = 1;
+                    best_move_evaluation = successor_evaluation;
+                }
+                else if (successor_evaluation == best_move_evaluation) {
                     saveToSuccessors(nsuccessors);
                     nsuccessors++;
                 }
-                moveQueen(i, queen_position);
+                
+                // Undo last move
+                setBuffer(current_state);
             }
         }
-    }
-}
-
-void hillClimbing() {
-    int optimum = (nqueens-1)*nqueens/2;
-    int iterations = 0;
-    
-    
-    while (iterations < MAXITER && evaluateBuffer() != optimum) {
-        int best_successors_indices[MAXQ];
-        int best_successors_count = 0;
-        int best_successor_value = -999;
-        nsuccessors = 0;
         
-        // Save current state
-        int current_state[10], i;
+        if (nsuccessors != 0) {
+            int random_successor = rand() % nsuccessors;
+            setBuffer(successors[random_successor]);
+        }
+        
+        // Update current state
         for (i=0; i<nqueens; i++) {
             current_state[i] = queens_buffer[i];
         }
         
-        generateBetterEqualSuccessors();
-        if (nsuccessors == 0) {
-            // No better successors found, no point on continue on the loop
-            break;
-        }
-        else {
-            for (i=0; i<nsuccessors; i++) {
-                setBuffer(successors[i]);
-                if (evaluateBuffer() > best_successor_value) {
-                    best_successor_value = evaluateBuffer();
-                    best_successors_indices[0] = i;
-                    best_successors_count = 1;
-                }
-                else if (evaluateBuffer() == best_successor_value) {
-                    best_successors_indices[best_successors_count] = i;
-                    best_successors_count++;
-                }
-                setBuffer(current_state);
-            }
-            
-            // Choose randomly between the best successors
-            int chosen_index = 0 + random() % (best_successors_count - 0);
-            setBuffer(successors[chosen_index]);
-            
-            iterations++;
-        }
+        iterations++;
     }
+    
     if (evaluateBuffer() == optimum) {
         printf ("Solved puzzle.\n");
-        printf ("Final state is:\n\n");
+        printf ("Solution:");
         printState();
         solutions_found++;
     }
-    else if (iterations >= MAXITER) {
-        printf("Maximum number of iterations reached. Puzzle not solved.\n");
+    else {
+        printf("Puzzle not solved. Final state:\n");
+        printState();
     }
-    else if (iterations < MAXITER) {
-        printf("Local maxima. Puzzle not solved.\n");
-    }
-}
-
-void hillClimbingFernando() {
-    int iterations = 0;
-    int optimum = (nqueens-1)*nqueens/2;
-    
-    int aux[nqueens], i;
-    for (i=0; i<nqueens; i++) {
-        aux[i] = queens_buffer[i];
-    }
-    while (iterations < MAXITER && evaluateBuffer() != optimum) {
-        int best = optimum; // flag that gives us the best result
-        int row=0, column=0; // flags that save the position of the best
-        int temp; // saves the temporary result of inconflict
-        for (int x = 0; x<nqueens; x++) {
-            for (int y = 0; y<nqueens; y++) {
-                setBuffer(aux);
-                moveQueen(x,y);
-                temp = countConflicts();
-                if (temp < best) {
-                    best = temp;
-                    row = x;
-                    column = y;
-                }
-                if (temp == best) {
-                    int ran = random() % 2;
-                    if (ran == 1) {
-                        best = temp;
-                        row = x;
-                        column = y;
-                    }
-                }
-            }
-        }
-        setBuffer(aux);
-        moveQueen(row,column);
-
-        for (i=0; i<nqueens; i++) {
-            aux[i] = queens_buffer[i];
-        }
-        
-        iterations++;
-    }
-    printf ("Final state is");
-    printState();
-    if (evaluateBuffer() != optimum)
-        printf("HAAAAAAAAAA");
-    
 }
 
 /*************************************************************/
@@ -679,9 +610,9 @@ int main(int argc, char *argv[]) {
         case 1: randomSearch();       break;
         case 2:
             solutions_found = 0;
-            for (i=0; i<1; i++) {
+            for (i=0; i<10; i++) {
                 initiateQueens(1);
-                hillClimbingFernando();
+                hillClimbing2();
             }
             printf("Algorithm finished. Found a solution in %d out of %d executions.\n", solutions_found, i);
             break;
