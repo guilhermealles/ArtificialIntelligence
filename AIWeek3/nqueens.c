@@ -6,9 +6,12 @@
 #include <time.h>
 
 #define MAXQ 100
-#define MAXSECONDS 16000
 #define MAXITER 10000
 
+// Constants for sumulated annealing
+#define TEMPERATURE_DECREASING_FACTOR 0.98
+
+// Constants for the genetic algorithm
 #define POPULATION_COUNT 5
 #define NEXT_GEN_COUNT 4*3*2*1 //(POPULATION_COUNT-1)!
 
@@ -378,6 +381,27 @@ void generateSuccessors() {
     }
 }
 
+void generateBetterEqualSuccessors() {
+    nsuccessors = 0;
+    int current_evaluation = evaluateBuffer();
+    
+    int i=0;
+    for (i=0; i<nqueens; i++) {
+        int column=0;
+        for (column=0; column<nqueens; column++) {
+            if (queens_buffer[i] != column) {
+                int queen_position = queens_buffer[i];
+                moveQueen(i, column);
+                if (evaluateBuffer() >= current_evaluation) {
+                    saveToSuccessors(nsuccessors);
+                    nsuccessors++;
+                }
+                moveQueen(i, queen_position);
+            }
+        }
+    }
+}
+
 void hillClimbing() {
     int optimum = (nqueens-1)*nqueens/2;
     int iterations = 0;
@@ -395,36 +419,93 @@ void hillClimbing() {
             current_state[i] = queens_buffer[i];
         }
         
-        generateSuccessors();
-        for (i=0; i<nsuccessors; i++) {
-            setBuffer(successors[i]);
-            if (evaluateBuffer() > best_successor_value) {
-                best_successor_value = evaluateBuffer();
-                best_successors_indices[0] = i;
-                best_successors_count = 1;
-            }
-            else if (evaluateBuffer() == best_successor_value) {
-                best_successors_indices[best_successors_count] = i;
-                best_successors_count++;
-            }
-            setBuffer(current_state);
+        generateBetterEqualSuccessors();
+        if (nsuccessors == 0) {
+            // No better successors found, no point on continue on the loop
+            break;
         }
-        
-        // Choose randomly between the best successors
-        int chosen_index = 0 + random() % (best_successors_count - 0);
-        setBuffer(successors[chosen_index]);
-        
-        iterations++;
+        else {
+            for (i=0; i<nsuccessors; i++) {
+                setBuffer(successors[i]);
+                if (evaluateBuffer() > best_successor_value) {
+                    best_successor_value = evaluateBuffer();
+                    best_successors_indices[0] = i;
+                    best_successors_count = 1;
+                }
+                else if (evaluateBuffer() == best_successor_value) {
+                    best_successors_indices[best_successors_count] = i;
+                    best_successors_count++;
+                }
+                setBuffer(current_state);
+            }
+            
+            // Choose randomly between the best successors
+            int chosen_index = 0 + random() % (best_successors_count - 0);
+            setBuffer(successors[chosen_index]);
+            
+            iterations++;
+        }
     }
-    if (iterations < MAXITER) {
+    if (evaluateBuffer() == optimum) {
         printf ("Solved puzzle.\n");
         printf ("Final state is:\n\n");
         printState();
         solutions_found++;
     }
-    else {
+    else if (iterations >= MAXITER) {
         printf("Maximum number of iterations reached. Puzzle not solved.\n");
     }
+    else if (iterations < MAXITER) {
+        printf("Local maxima. Puzzle not solved.\n");
+    }
+}
+
+void hillClimbingFernando() {
+    int iterations = 0;
+    int optimum = (nqueens-1)*nqueens/2;
+    
+    int aux[nqueens], i;
+    for (i=0; i<nqueens; i++) {
+        aux[i] = queens_buffer[i];
+    }
+    while (iterations < MAXITER && evaluateBuffer() != optimum) {
+        int best = optimum; // flag that gives us the best result
+        int row=0, column=0; // flags that save the position of the best
+        int temp; // saves the temporary result of inconflict
+        for (int x = 0; x<nqueens; x++) {
+            for (int y = 0; y<nqueens; y++) {
+                setBuffer(aux);
+                moveQueen(x,y);
+                temp = countConflicts();
+                if (temp < best) {
+                    best = temp;
+                    row = x;
+                    column = y;
+                }
+                if (temp == best) {
+                    int ran = random() % 2;
+                    if (ran == 1) {
+                        best = temp;
+                        row = x;
+                        column = y;
+                    }
+                }
+            }
+        }
+        setBuffer(aux);
+        moveQueen(row,column);
+
+        for (i=0; i<nqueens; i++) {
+            aux[i] = queens_buffer[i];
+        }
+        
+        iterations++;
+    }
+    printf ("Final state is");
+    printState();
+    if (evaluateBuffer() != optimum)
+        printf("HAAAAAAAAAA");
+    
 }
 
 /*************************************************************/
@@ -437,7 +518,7 @@ double timeToTemperature(long int clock, double temperature)
 }
 
 double timeToTemperatureLinear(double temperature) {
-        return temperature -0.0001;
+        return temperature * TEMPERATURE_DECREASING_FACTOR;
 }
 
 void simulatedAnnealing() {
@@ -521,9 +602,10 @@ void simulatedAnnealing() {
 void simulatedAnnealing2() {
     int optimum = (nqueens-1)*nqueens/2;
     int iterations = 0;
-    double temperature = 100;
+    double initial_temperature = 100;
+    double current_temperature = initial_temperature;
     
-    while (evaluateBuffer() != optimum && temperature > 0.00001) {
+    while (evaluateBuffer() != optimum && current_temperature > 0.005) {
         generateSuccessors();
         
         // Save current state
@@ -544,8 +626,7 @@ void simulatedAnnealing2() {
             setBuffer(successors[random_successor_index]);
         }
         else {
-            temperature = timeToTemperatureLinear(temperature);
-            double probability_of_change = exp(delta/temperature);
+            double probability_of_change = exp(delta/current_temperature);
             double random_number = (rand() % 100) / (double)100;
             if (random_number < probability_of_change) {
                 setBuffer(successors[random_successor_index]);
@@ -554,16 +635,20 @@ void simulatedAnnealing2() {
                 setBuffer(current_state);
             }
         }
+        
+        // Update temperature
+        current_temperature = timeToTemperatureLinear(current_temperature);
         iterations++;
     }
     if (evaluateBuffer() == optimum) {
         printf ("Solved puzzle.\n");
-        printf ("Solution:\n\n");
+        printf ("Solution:");
         printState();
         solutions_found++;
     }
     else {
-        printf("Not solved in this iteration.\n");
+        printf("Not solved in this iteration. Final state:");
+        printState();
     }
 }
 
@@ -594,9 +679,9 @@ int main(int argc, char *argv[]) {
         case 1: randomSearch();       break;
         case 2:
             solutions_found = 0;
-            for (i=0; i<100; i++) {
+            for (i=0; i<1; i++) {
                 initiateQueens(1);
-                hillClimbing();
+                hillClimbingFernando();
             }
             printf("Algorithm finished. Found a solution in %d out of %d executions.\n", solutions_found, i);
             break;
