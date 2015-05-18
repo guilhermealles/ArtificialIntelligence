@@ -7,6 +7,7 @@
 
 #define MAXQ 100
 #define MAXSECONDS 16000
+#define MAXITER 10000
 
 #define POPULATION_COUNT 5
 #define NEXT_GEN_COUNT 4*3*2*1 //(POPULATION_COUNT-1)!
@@ -23,6 +24,8 @@ int successors[MAXQ][MAXQ];
 
 int current_population[POPULATION_COUNT][MAXQ];
 int next_generation[NEXT_GEN_COUNT][MAXQ]; //Next generation has size (POPULATION_COUNT-1)!;
+
+int solutions_found; // Counts the number of solutions found in a certain number of executions
 
 void initializeRandomGenerator() {
     /* this routine initializes the random generator. You are not
@@ -290,17 +293,6 @@ void printSolutionFromPopulation() {
     }
 }
 
-void printCurrentPopulation() {
-    int i;
-    for (i=0; i<POPULATION_COUNT; i++) {
-        int j;
-        for (j=0; j<nqueens; j++) {
-            printf("%d ", current_population[i][j]);
-        }
-        printf("\n");
-    }
-}
-
 void geneticAlgorithm() {
     int generation_count = 0;
     
@@ -332,7 +324,6 @@ void geneticAlgorithm() {
 /*************************************************************/
 
 /* A very silly random search 'algorithm' */
-#define MAXITER 100000
 void randomSearch() {
     int queen, iter = 0;
     int optimum = (nqueens-1)*nqueens/2;
@@ -429,6 +420,7 @@ void hillClimbing() {
         printf ("Solved puzzle.\n");
         printf ("Final state is:\n\n");
         printState();
+        solutions_found++;
     }
     else {
         printf("Maximum number of iterations reached. Puzzle not solved.\n");
@@ -445,10 +437,7 @@ double timeToTemperature(long int clock, double temperature)
 }
 
 double timeToTemperatureLinear(double temperature) {
-    if (temperature > 11)
-        return temperature -1;
-    else
-        return temperature - 0.01;
+        return temperature -0.0001;
 }
 
 void simulatedAnnealing() {
@@ -472,7 +461,7 @@ void simulatedAnnealing() {
         current_state[i] = queens_buffer[i];
     }
     
-    while(iterations < MAXITER && evaluateBuffer() != optimum && temperature > 0.00001)
+    while(evaluateBuffer() != optimum && temperature > 0.001)
     {
         setBuffer(current_state);
         current_evaluation = evaluateBuffer();
@@ -491,6 +480,7 @@ void simulatedAnnealing() {
         
         delta = successor_evaluation - current_evaluation;
         
+        // If the move is better
         if (delta > 0)
         {
             // Update current state to next state
@@ -502,10 +492,8 @@ void simulatedAnnealing() {
         }
         else
         {
-            //probability =  exp(delta/temperature);
-            //rand = (double)((random() % 100)/(double)100);
-            probability = temperature;
-            rand = random()%100;
+            probability =  exp(delta/temperature);
+            rand = (double)((random() % 100)/(double)100);
             if (rand < probability)
             {
                 // Update current state to next state
@@ -523,7 +511,7 @@ void simulatedAnnealing() {
         printf ("Solved puzzle.\n");
         printf ("Final state is:\n\n");
         printState();
-        getchar();
+        solutions_found++;
     }
     else {
         printf("Maximum number of iterations reached. Puzzle not solved.\n");
@@ -535,7 +523,7 @@ void simulatedAnnealing2() {
     int iterations = 0;
     double temperature = 100;
     
-    while (iterations < MAXITER && evaluateBuffer() != optimum && temperature > 0.0001) {
+    while (evaluateBuffer() != optimum && temperature > 0.00001) {
         generateSuccessors();
         
         // Save current state
@@ -551,6 +539,7 @@ void simulatedAnnealing2() {
         int successor_evaluation = evaluateBuffer();
         
         int delta = successor_evaluation - current_evaluation;
+        // If the chosen successor is better than the current state
         if (delta > 0) {
             setBuffer(successors[random_successor_index]);
         }
@@ -558,23 +547,20 @@ void simulatedAnnealing2() {
             temperature = timeToTemperatureLinear(temperature);
             double probability_of_change = exp(delta/temperature);
             double random_number = (rand() % 100) / (double)100;
-            //printf("Bad move: ");
             if (random_number < probability_of_change) {
                 setBuffer(successors[random_successor_index]);
-                //printf("done. Probability: %.2f. ", probability_of_change);
             }
             else { // Else, revert state to the original one
                 setBuffer(current_state);
-                //printf("NOT done. Probability: %.2f. ", probability_of_change);
             }
         }
-        //printf("Temperature: %.4f\tEvaluation: %d/%d\n", temperature, evaluateState(), optimum);
         iterations++;
     }
     if (evaluateBuffer() == optimum) {
         printf ("Solved puzzle.\n");
-        printf ("Final state is:\n\n");
+        printf ("Solution:\n\n");
         printState();
+        solutions_found++;
     }
     else {
         printf("Not solved in this iteration.\n");
@@ -607,17 +593,21 @@ int main(int argc, char *argv[]) {
     switch (algorithm) {
         case 1: randomSearch();       break;
         case 2:
+            solutions_found = 0;
             for (i=0; i<100; i++) {
                 initiateQueens(1);
                 hillClimbing();
             }
+            printf("Algorithm finished. Found a solution in %d out of %d executions.\n", solutions_found, i);
             break;
         case 3:
+            solutions_found = 0;
             for(i = 0; i < 100; i++)
             {
                 initiateQueens(1);
                 simulatedAnnealing2();
             }
+            printf("Algorithm finished. Found a solution in %d out of %d executions.\n", solutions_found, i);
             break;
         case 4:
             initiateQueens(1);
