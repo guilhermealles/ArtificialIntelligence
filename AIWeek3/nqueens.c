@@ -10,6 +10,7 @@
 
 // Constants for sumulated annealing
 #define TEMPERATURE_DECREASING_FACTOR 0.98
+#define INITIAL_TEMPERATURE 100
 
 // Constants for the genetic algorithm
 #define POPULATION_COUNT 5
@@ -440,12 +441,15 @@ void hillClimbing() {
 }
 
 /*************************************************************/
-double timeToTemperature(long int clock, double temperature)
+double timeToTemperature(clock_t clock_start)
 {
-    if (clock == 0) {
-        return 9999999999;
+    clock_t clock_end = clock();
+    long int clock_diff = clock_end - clock_start;
+    if (clock_diff == 0) {
+        return 999999999;
     }
-    return temperature - 0.0001;//((double)clock/((long int)CLOCKS_PER_SEC*100000));
+    
+    return INITIAL_TEMPERATURE - ((double)clock_diff/((double)CLOCKS_PER_SEC));
 }
 
 double timeToTemperatureLinear(double temperature) {
@@ -480,7 +484,7 @@ void simulatedAnnealing() {
         
         clock_end = clock();
         clock_time = clock_end - clock_start;
-        temperature = timeToTemperature(clock_time, temperature);
+        temperature = timeToTemperature(clock_start);
         //printf("%f\n", temperature);
         
         generateSuccessors();
@@ -531,36 +535,38 @@ void simulatedAnnealing() {
 }
 
 void simulatedAnnealing2() {
+    clock_t clock_start;
     int optimum = (nqueens-1)*nqueens/2;
     int iterations = 0;
-    double initial_temperature = 100;
-    double current_temperature = initial_temperature;
+    double current_temperature = INITIAL_TEMPERATURE;
     
+    // Starts the clock counter
+    clock_start = clock();
     while (evaluateBuffer() != optimum && current_temperature > 0.005) {
-        generateSuccessors();
-        
         // Save current state
         int current_evaluation = evaluateBuffer();
         int current_state[nqueens], i;
         for (i=0; i<nqueens; i++) {
             current_state[i] = queens_buffer[i];
         }
+        setBuffer(current_state);
         
-        // Get a random successor
-        int random_successor_index = random() % nqueens;
-        setBuffer(successors[random_successor_index]);
+        // Make a random move
+        int random_queen = rand() % nqueens;
+        int random_column = rand() % nqueens;
+        moveQueen(random_queen, random_column);
         int successor_evaluation = evaluateBuffer();
         
         int delta = successor_evaluation - current_evaluation;
         // If the chosen successor is better than the current state
         if (delta > 0) {
-            setBuffer(successors[random_successor_index]);
+            // do nothing
         }
         else {
             double probability_of_change = exp(delta/current_temperature);
             double random_number = (rand() % 100) / (double)100;
             if (random_number < probability_of_change) {
-                setBuffer(successors[random_successor_index]);
+                // do nothing
             }
             else { // Else, revert state to the original one
                 setBuffer(current_state);
@@ -568,7 +574,7 @@ void simulatedAnnealing2() {
         }
         
         // Update temperature
-        current_temperature = timeToTemperatureLinear(current_temperature);
+        current_temperature = timeToTemperature(clock_start);
         iterations++;
     }
     if (evaluateBuffer() == optimum) {
@@ -618,7 +624,7 @@ int main(int argc, char *argv[]) {
             break;
         case 3:
             solutions_found = 0;
-            for(i = 0; i < 100; i++)
+            for(i = 0; i < 10; i++)
             {
                 initiateQueens(1);
                 simulatedAnnealing2();
