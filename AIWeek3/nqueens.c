@@ -302,7 +302,7 @@ void geneticAlgorithm() {
     // Initializes the population
     int i;
     for (i=0; i<POPULATION_COUNT; i++) {
-        initiateQueens(0);
+        initiateQueens(1);
         addBufferToPopulation(i);
     }
     
@@ -381,7 +381,7 @@ void generateSuccessors() {
     }
 }
 
-void hillClimbing2() {
+void hillClimbing() {
     int iterations = 0;
     int optimum = (nqueens-1)*nqueens/2;
     
@@ -610,9 +610,9 @@ int main(int argc, char *argv[]) {
         case 1: randomSearch();       break;
         case 2:
             solutions_found = 0;
-            for (i=0; i<10; i++) {
+            for (i=0; i<1000; i++) {
                 initiateQueens(1);
-                hillClimbing2();
+                hillClimbing();
             }
             printf("Algorithm finished. Found a solution in %d out of %d executions.\n", solutions_found, i);
             break;
