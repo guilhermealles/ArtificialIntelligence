@@ -55,17 +55,7 @@ int minValue(int state) {
 }
 
 int minimaxDecision(int state, int turn) {
-<<<<<<< HEAD
-<<<<<<< HEAD
     int move, bestmove=0, max, min;
-=======
-    int move, bestmove, max, min;
-    
->>>>>>> origin/master
-=======
-    int move, bestmove, max, min;
-    
->>>>>>> origin/master
     if (turn == MAX_V) {
         max = -INF;
         for (move = 1; move <= 3; move++) {
@@ -93,30 +83,13 @@ int minimaxDecision(int state, int turn) {
     return bestmove;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 int negamaxValue(int state, int turn) {
-=======
-=======
->>>>>>> origin/master
-
-int negamaxValue(int state, int player) {
->>>>>>> origin/master
     int move, max = -INF;
     
     /* terminal state ? */
     if (state == 1) {
         return -1;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> origin/master
-=======
-
->>>>>>> origin/master
     /* non-terminal state */
     for (move = 1; move <= 3; move++) {
         if (state - move > 0) { /* legal move */
@@ -130,14 +103,7 @@ int negamaxValue(int state, int player) {
 
 int negamaxDecision(int state, int turn) {
     int move, bestmove = 0, max = -INF;
-    
-    if (transposition_table[state] != -1)
-    {
-        // If the value already exists in the transposition table, makes its correspondent move.
-        return transposition_table[state];
-    }
-    
-    // If not, searches for it.
+   
     for (move=1; move<=3; move++) {
         if (state - move > 0) {
             int m = -negamaxValue(state - move, 1 - turn);
@@ -187,12 +153,10 @@ void initializeTranspositionTable()
 }
 
 int main(int argc, char *argv[]) {
-<<<<<<< HEAD
     playNim(7);
     printf("\n\n Negamax:\n");
     playNimNegamax(7);
 
-=======
     /*
      if ((argc != 2) || (atoi(argv[1]) < 3)) {
      fprintf(stderr, "Usage: %s <number of sticks>, where ", argv[0]);
@@ -202,14 +166,5 @@ int main(int argc, char *argv[]) {
      playNim(atoi(argv[1]));
      */
    
-    initializeTranspositionTable();
-    playNim(7);
-    //printf("Negamax: \n");
-    //playNimNegamax(8);
-    
-<<<<<<< HEAD
->>>>>>> origin/master
-=======
->>>>>>> origin/master
     return 0;
 }
