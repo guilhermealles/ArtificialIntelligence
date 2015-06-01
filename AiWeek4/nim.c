@@ -167,7 +167,12 @@ int main(int argc, char *argv[]) {
     
     //playNim(atoi(argv[1]));
     
+<<<<<<< HEAD
     //playNim(3);
     playNimNegamax(3);
+=======
+    playNim(6);
+
+>>>>>>> origin/master
     return 0;
 }
