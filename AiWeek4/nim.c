@@ -101,8 +101,13 @@ int evaluate(int state)
 // Returns an array with the best move (index 0) and its evaluation (index 1).
 int* negamax(int state)
 {
+<<<<<<< Updated upstream
     int best_choice[2]; // TODO need malloc
     int move, value, best_value = -INF, best_move;
+=======
+    int* best_choice = malloc(2 * sizeof(int));
+    int move = 0, value, best_value = -INF, best_move;
+>>>>>>> Stashed changes
     
     if (state - move == 0) // Is terminal state
     {
@@ -113,23 +118,27 @@ int* negamax(int state)
     
     for (move = 1; move <=3; move++)
     {
-        if (state - move > 0)
+        
+        if (state - move > 0) // Is a valid move
         {
             int new_choice[2];
             new_choice[0] = move;
             new_choice[1] = evaluate(state - move);
             
-            //int evaluated_choice[2]
+            int evaluated_choice[2]'
+            evaluated_choice = negamax(state - move);
+            evaluated_choice[1] = -1 * evaluated_choice[1];
             
-            if (value > best)
+            if (evaluated_choice[1] > best_value)
             {
-                best_value = value;
+                best_value = evaluated_choice[1];
                 best_move = move;
             }
         }
     }
     
-    best_choice[0] = best;
+    best_choice[0] = best_move;
+    best_choice[1] = best_value;
     return best_choice;
 }
  */
@@ -183,7 +192,12 @@ void playNimNegamax(int state)
     int turn = 0;
     while (state != 1)
     {
+<<<<<<< Updated upstream
         int action = negamaxDecision(state);
+=======
+        int result[2];
+        result = negamax(state);
+>>>>>>> Stashed changes
         printf("%d: %s takes %d\n", state, (turn==MAX_V ? "Max" : "Min"), action);
         state = state - action;
         turn = 1 - turn;
@@ -202,7 +216,13 @@ int main(int argc, char *argv[]) {
      */
     
     //playNim(atoi(argv[1]));
+<<<<<<< Updated upstream
     
     playNimNegamax(3);
+=======
+    //playNim(3);
+    playNimNegamax(3);
+
+>>>>>>> Stashed changes
     return 0;
 }
