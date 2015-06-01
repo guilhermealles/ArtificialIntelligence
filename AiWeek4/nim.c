@@ -11,7 +11,7 @@
 int minValue(int state); /* forward declaration: mutual recursion */
 
 int maxValue(int state) {
-    int move, max = INF;
+    int move, max = -INF;
     /* terminal state ? */
     if (state == 1) {
         return -1; /* Min wins if max is in a terminal state */
@@ -43,7 +43,8 @@ int minValue(int state) {
 }
 
 int minimaxDecision(int state, int turn) {
-    int move, bestmove = 0, max, min;
+    int move, bestmove, max, min;
+    
     if (turn == MAX_V) {
         max = -INF;
         for (move = 1; move <= 3; move++) {
@@ -58,91 +59,18 @@ int minimaxDecision(int state, int turn) {
         return bestmove;
     }
     /* turn == MIN */
-    else {
-        min = INF;
-        for (move = 1; move <= 3; move++) {
-            if (state - move > 0) { /* legal move */
-                int m = maxValue(state - move);
-                if (m < min) {
-                    min = m;
-                    bestmove = move;
-                }
-            }
-        }
-        return bestmove;
-    }
-}
-/*
-int evaluate(int state)
-{
-    int move, best = INF, best_move;
-    
-    if (state == 1) // Terminal state
-    {
-        return 1;
-    }
-    
-    for (move = 1; move <=3; move++)
-    {
-        if (state - move > 0)
-        {
-            int m = evaluate(state - move);
-            
-            if (m > best)
-            {
-                best = m;
-                best_move = move;
+    min = INF;
+    for (move = 1; move <= 3; move++) {
+        if (state - move > 0) { /* legal move */
+            int m = maxValue(state - move);
+            if (m < min) {
+                min = m;
+                bestmove = move;
             }
         }
     }
-    return best;
+    return bestmove;
 }
-
-// Returns an array with the best move (index 0) and its evaluation (index 1).
-int* negamax(int state)
-{
-<<<<<<< Updated upstream
-    int best_choice[2]; // TODO need malloc
-    int move, value, best_value = -INF, best_move;
-=======
-    int* best_choice = malloc(2 * sizeof(int));
-    int move = 0, value, best_value = -INF, best_move;
->>>>>>> Stashed changes
-    
-    if (state - move == 0) // Is terminal state
-    {
-        best_choice[0] = move;
-        best_choice[1] = evaluate(state);
-        return best_choice;
-    }
-    
-    for (move = 1; move <=3; move++)
-    {
-        
-        if (state - move > 0) // Is a valid move
-        {
-            int new_choice[2];
-            new_choice[0] = move;
-            new_choice[1] = evaluate(state - move);
-            
-            int evaluated_choice[2]'
-            evaluated_choice = negamax(state - move);
-            evaluated_choice[1] = -1 * evaluated_choice[1];
-            
-            if (evaluated_choice[1] > best_value)
-            {
-                best_value = evaluated_choice[1];
-                best_move = move;
-            }
-        }
-    }
-    
-    best_choice[0] = best_move;
-    best_choice[1] = best_value;
-    return best_choice;
-}
- */
-
 int negamaxValue(int state, int player) {
     int move, max = -INF;
     /* terminal state ? */
@@ -177,11 +105,13 @@ int negamaxDecision(int state) {
     return bestmove;
 }
 
+
 void playNim(int state) {
     int turn = 0;
     while (state != 1) {
         int action = minimaxDecision(state, turn);
-        printf("%d: %s takes %d\n", state, (turn==MAX_V ? "Max" : "Min"), action);
+        printf("%d: %s takes %d\n", state,
+               (turn==MAX_V ? "Max" : "Min"), action);
         state = state - action;
         turn = 1 - turn;
     }
@@ -211,25 +141,8 @@ int main(int argc, char *argv[]) {
      }
      */
     
-    //playNim(atoi(argv[1]));
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-    playNim(20);
-    //playNimNegamax(20);
-=======
-<<<<<<< Updated upstream
-    
-    playNimNegamax(3);
-=======
-    //playNim(3);
-    playNimNegamax(3);
 
->>>>>>> Stashed changes
->>>>>>> origin/master
-=======
-    playNim(20);
-    //playNimNegamax(20);
-
->>>>>>> Stashed changes
+    //playNim(20);
+    playNimNegamax(20);
     return 0;
 }
