@@ -160,20 +160,30 @@ void initializeTranspositionTable()
 }
 
 int main(int argc, char *argv[]) {
+    if ((argc != 2) || (atoi(argv[1]) < 3)) {
+        fprintf(stderr, "Usage: %s <number of sticks>, where ", argv[0]);
+        fprintf(stderr, "<number of sticks> must be at least 3!\n");
+        return -1;
+    }
+    
     initializeTranspositionTable();
-
-    //playNim(8);
-    printf("\n\n Negamax:\n");
-    playNimNegamax(50);
-
-    /*
-     if ((argc != 2) || (atoi(argv[1]) < 3)) {
-     fprintf(stderr, "Usage: %s <number of sticks>, where ", argv[0]);
-     fprintf(stderr, "<number of sticks> must be at least 3!\n");
-     return -1;
-     }
-     playNim(atoi(argv[1]));
-     */
-   
+    
+    int option = -1;
+    while (!(option == 0 || option == 1)) {
+        printf("Which algorithm to use? (Minimax = 0, Negamax = 1):\n");
+        scanf("%d", &option);
+    }
+    switch (option) {
+        case 0:
+            playNim(atoi(argv[1]));
+            break;
+        case 1:
+            playNimNegamax(atoi(argv[1]));
+            break;
+        default:
+            playNim(atoi(argv[1]));
+            break;
+    }
+    
     return 0;
 }
