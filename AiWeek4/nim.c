@@ -193,12 +193,7 @@ void playNimNegamax(int state)
     int turn = 0;
     while (state != 1)
     {
-<<<<<<< Updated upstream
         int action = negamaxDecision(state);
-=======
-        int result[2];
-        result = negamax(state);
->>>>>>> Stashed changes
         printf("%d: %s takes %d\n", state, (turn==MAX_V ? "Max" : "Min"), action);
         state = state - action;
         turn = 1 - turn;
@@ -217,6 +212,7 @@ int main(int argc, char *argv[]) {
      */
     
     //playNim(atoi(argv[1]));
+<<<<<<< Updated upstream
 <<<<<<< HEAD
     playNim(20);
     //playNimNegamax(20);
@@ -230,5 +226,10 @@ int main(int argc, char *argv[]) {
 
 >>>>>>> Stashed changes
 >>>>>>> origin/master
+=======
+    playNim(20);
+    //playNimNegamax(20);
+
+>>>>>>> Stashed changes
     return 0;
 }
