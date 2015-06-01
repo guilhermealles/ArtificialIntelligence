@@ -94,8 +94,9 @@ int negamaxValue(int state, int turn) {
     for (move = 1; move <= 3; move++) {
         if (state - move > 0) { /* legal move */
             int m =  - negamaxValue(state - move, 1 - turn);
-            if (m > max)
+            if (m > max) {
                 max = m;
+            }
         }
     }
     return max;
