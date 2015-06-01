@@ -5,10 +5,17 @@
 #define MAX_V 0
 #define MIN_V 1
 
+#define MAX_STICKS 100
 #define INF 9999999
 
+int transposition_table[2][MAX_STICKS +1];
 
 int minValue(int state); /* forward declaration: mutual recursion */
+
+void addValueToTable(int turn, int state, int action)
+{
+    transposition_table[turn][state] = action;
+}
 
 int maxValue(int state) {
     int move, max = -INF;
@@ -16,9 +23,11 @@ int maxValue(int state) {
     if (state == 1) {
         return -1; /* Min wins if max is in a terminal state */
     }
+    
     /* non-terminal state */
     for (move = 1; move <= 3; move++) {
         if (state - move > 0) { /* legal move */
+            
             int m = minValue(state - move);
             if (m > max) max = m;
         }
@@ -32,21 +41,25 @@ int minValue(int state) {
     if (state == 1) {
         return 1; /* Max wins if min is in a terminal state */
     }
+    
     /* non-terminal state */
     for (move = 1; move <= 3; move++) {
         if (state - move > 0) { /* legal move */
+            
             int m = maxValue(state - move);
             if (m < min) min = m;
         }
     }
+    
     return min;
 }
 
 int minimaxDecision(int state, int turn) {
-    int move, bestmove, max, min;
 <<<<<<< HEAD
-    
+    int move, bestmove=0, max, min;
 =======
+    int move, bestmove, max, min;
+    
 >>>>>>> origin/master
     if (turn == MAX_V) {
         max = -INF;
@@ -74,31 +87,48 @@ int minimaxDecision(int state, int turn) {
     }
     return bestmove;
 }
+
+<<<<<<< HEAD
+int negamaxValue(int state, int turn) {
+=======
+
 int negamaxValue(int state, int player) {
+>>>>>>> origin/master
     int move, max = -INF;
+    
     /* terminal state ? */
     if (state == 1) {
-        int return_val = player == MAX_V ? -1 : 1;
-        return return_val;
+        return -1;
     }
+<<<<<<< HEAD
+    
+=======
+
+>>>>>>> origin/master
     /* non-terminal state */
     for (move = 1; move <= 3; move++) {
         if (state - move > 0) { /* legal move */
-            int m = negamaxValue(state - move, 1-player);
+            int m =  - negamaxValue(state - move, 1 - turn);
             if (m > max)
                 max = m;
         }
     }
     return max;
-
 }
 
-int negamaxDecision(int state) {
+int negamaxDecision(int state, int turn) {
     int move, bestmove = 0, max = -INF;
     
+    if (transposition_table[state] != -1)
+    {
+        // If the value already exists in the transposition table, makes its correspondent move.
+        return transposition_table[state];
+    }
+    
+    // If not, searches for it.
     for (move=1; move<=3; move++) {
         if (state - move > 0) {
-            int m = -1 * negamaxValue(state - move, MAX_V);
+            int m = -negamaxValue(state - move, 1 - turn);
             if (m > max) {
                 max = m;
                 bestmove = move;
@@ -113,8 +143,7 @@ void playNim(int state) {
     int turn = 0;
     while (state != 1) {
         int action = minimaxDecision(state, turn);
-        printf("%d: %s takes %d\n", state,
-               (turn==MAX_V ? "Max" : "Min"), action);
+        printf("%d: %s takes %d\n", state, (turn==MAX_V ? "Max" : "Min"), action);
         state = state - action;
         turn = 1 - turn;
     }
@@ -126,7 +155,7 @@ void playNimNegamax(int state)
     int turn = 0;
     while (state != 1)
     {
-        int action = negamaxDecision(state);
+        int action = negamaxDecision(state, turn);
         printf("%d: %s takes %d\n", state, (turn==MAX_V ? "Max" : "Min"), action);
         state = state - action;
         turn = 1 - turn;
@@ -135,46 +164,37 @@ void playNimNegamax(int state)
 }
 
 
+void initializeTranspositionTable()
+{
+    // Initializes all movements with -1.
+    for (int i = 0; i <= MAX_STICKS; i++)
+    {
+        transposition_table[0][i] = -1;
+        transposition_table[1][i] = -1;
+    }
+}
+
 int main(int argc, char *argv[]) {
+<<<<<<< HEAD
+    playNim(7);
+    printf("\n\n Negamax:\n");
+    playNimNegamax(7);
+
+=======
     /*
      if ((argc != 2) || (atoi(argv[1]) < 3)) {
      fprintf(stderr, "Usage: %s <number of sticks>, where ", argv[0]);
      fprintf(stderr, "<number of sticks> must be at least 3!\n");
      return -1;
      }
+     playNim(atoi(argv[1]));
      */
+   
+    initializeTranspositionTable();
+    playNim(7);
+    //printf("Negamax: \n");
+    //playNimNegamax(8);
     
-<<<<<<< HEAD
-
-    //playNim(20);
-    playNimNegamax(20);
-=======
-    //playNim(atoi(argv[1]));
-<<<<<<< HEAD
-    
-    playNim(20);
-    //playNimNegamax(20);
-=======
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-    playNim(20);
-    //playNimNegamax(20);
-=======
-<<<<<<< Updated upstream
-    
-    playNimNegamax(3);
-=======
-    //playNim(3);
-    playNimNegamax(3);
-
->>>>>>> Stashed changes
->>>>>>> origin/master
-=======
-    playNim(20);
-    //playNimNegamax(20);
-
->>>>>>> Stashed changes
->>>>>>> origin/master
 >>>>>>> origin/master
     return 0;
 }
