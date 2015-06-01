@@ -71,6 +71,66 @@ int minimaxDecision(int state, int turn) {
     return bestmove;
 }
 
+int evaluate(int state)
+{
+    int move, best = INF, best_move;
+    
+    if (state == 1) // Terminal state
+    {
+        return 1;
+    }
+    
+    for (move = 1; move <=3; move++)
+    {
+        if (state - move > 0)
+        {
+            int m = evaluate(state - move);
+            
+            if (m > best)
+            {
+                best = m;
+                best_move = move;
+            }
+        }
+    }
+    return best;
+}
+
+// Returns an array with the best move (index 0) and its evaluation (index 1).
+int* negamax(int state)
+{
+    int best_choice[2];
+    int move, value, best_value = -INF, best_move;
+    
+    if (state - move == 0) // Is terminal state
+    {
+        best_choice[0] = move;
+        best_choice[1] = evaluate(state);
+        return best_choice;
+    }
+    
+    for (move = 1; move <=3; move++)
+    {
+        if (state - move > 0)
+        {
+            int[2] new_choice;
+            new_choice[0] = move;
+            new_choice[1] = evaluate(state - move);
+            
+            //int evaluated_choice[2]
+            
+            if (value > best)
+            {
+                best_value = value;
+                best_move = move;
+            }
+        }
+    }
+    
+    best_choice[0] = best;
+    return best_choice;
+}
+
 void playNim(int state) {
     int turn = 0;
     while (state != 1) {
@@ -82,18 +142,32 @@ void playNim(int state) {
     printf("1: %s looses\n", (turn==MAX_V ? "Max" : "Min"));
 }
 
+void playNimNegamax(int state)
+{
+    int turn = 0;
+    while (state != 1)
+    {
+        int action = negamax(state);
+        printf("%d: %s takes %d\n", state, (turn==MAX_V ? "Max" : "Min"), action);
+        state = state - action;
+        turn = 1 - turn;
+    }
+    printf("1: %s looses\n", (turn==MAX_V ? "Max" : "Min"));
+}
+
+
 int main(int argc, char *argv[]) {
     /*
      if ((argc != 2) || (atoi(argv[1]) < 3)) {
-        fprintf(stderr, "Usage: %s <number of sticks>, where ", argv[0]);
-        fprintf(stderr, "<number of sticks> must be at least 3!\n");
-        return -1;
+     fprintf(stderr, "Usage: %s <number of sticks>, where ", argv[0]);
+     fprintf(stderr, "<number of sticks> must be at least 3!\n");
+     return -1;
      }
      */
-
+    
     //playNim(atoi(argv[1]));
     
-    playNim(3);
-
+    //playNim(3);
+    playNimNegamax(3);
     return 0;
 }
