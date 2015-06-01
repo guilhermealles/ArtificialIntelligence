@@ -99,12 +99,8 @@ int negamaxValue(int state, int turn) {
                 return transposition_table[turn][state-move];
             }
             int m =  - negamaxValue(state - move, 1 - turn);
-<<<<<<< HEAD
             if (m > max) {
-=======
-            addValueToTable(turn, state - move, m);
-            if (m > max)
->>>>>>> origin/master
+                addValueToTable(turn, state - move, m);
                 max = m;
             }
         }
