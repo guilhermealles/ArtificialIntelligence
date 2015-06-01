@@ -12,9 +12,9 @@ int transposition_table[2][MAX_STICKS +1];
 
 int minValue(int state); /* forward declaration: mutual recursion */
 
-void addValueToTable(int turn, int state, int action)
+void addValueToTable(int turn, int state, int value)
 {
-    transposition_table[turn][state] = action;
+    transposition_table[turn][state] = value;
 }
 
 int maxValue(int state) {
@@ -93,7 +93,13 @@ int negamaxValue(int state, int turn) {
     /* non-terminal state */
     for (move = 1; move <= 3; move++) {
         if (state - move > 0) { /* legal move */
+            
+            if (transposition_table[turn][state-move] != -1)
+            {
+                return transposition_table[turn][state-move];
+            }
             int m =  - negamaxValue(state - move, 1 - turn);
+            addValueToTable(turn, state - move, m);
             if (m > max)
                 max = m;
         }
@@ -153,9 +159,11 @@ void initializeTranspositionTable()
 }
 
 int main(int argc, char *argv[]) {
-    playNim(7);
+    initializeTranspositionTable();
+
+    //playNim(8);
     printf("\n\n Negamax:\n");
-    playNimNegamax(7);
+    playNimNegamax(50);
 
     /*
      if ((argc != 2) || (atoi(argv[1]) < 3)) {
