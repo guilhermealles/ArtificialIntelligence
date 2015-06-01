@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 
     //playNim(atoi(argv[1]));
     
-    playNim(6);
+    playNim(40);
 
     return 0;
 }
