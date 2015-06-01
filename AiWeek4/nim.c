@@ -134,16 +134,17 @@ int* negamax(int state)
 }
  */
 
-int negamaxValue(int state) {
+int negamaxValue(int state, int player) {
     int move, max = -INF;
     /* terminal state ? */
     if (state == 1) {
-        return 1;
+        int return_val = player == MAX_V ? -1 : 1;
+        return return_val;
     }
     /* non-terminal state */
     for (move = 1; move <= 3; move++) {
         if (state - move > 0) { /* legal move */
-            int m = negamaxValue(state - move);
+            int m = negamaxValue(state - move, 1-player);
             if (m > max)
                 max = m;
         }
@@ -157,7 +158,7 @@ int negamaxDecision(int state) {
     
     for (move=1; move<=3; move++) {
         if (state - move > 0) {
-            int m = -1 * negamaxValue(state - move);
+            int m = -1 * negamaxValue(state - move, MAX_V);
             if (m > max) {
                 max = m;
                 bestmove = move;
@@ -202,7 +203,7 @@ int main(int argc, char *argv[]) {
      */
     
     //playNim(atoi(argv[1]));
-    
-    playNimNegamax(3);
+    playNim(20);
+    //playNimNegamax(20);
     return 0;
 }
