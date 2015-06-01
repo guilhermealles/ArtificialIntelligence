@@ -44,7 +44,10 @@ int minValue(int state) {
 
 int minimaxDecision(int state, int turn) {
     int move, bestmove, max, min;
+<<<<<<< HEAD
     
+=======
+>>>>>>> origin/master
     if (turn == MAX_V) {
         max = -INF;
         for (move = 1; move <= 3; move++) {
@@ -141,8 +144,37 @@ int main(int argc, char *argv[]) {
      }
      */
     
+<<<<<<< HEAD
 
     //playNim(20);
     playNimNegamax(20);
+=======
+    //playNim(atoi(argv[1]));
+<<<<<<< HEAD
+    
+    playNim(20);
+    //playNimNegamax(20);
+=======
+<<<<<<< Updated upstream
+<<<<<<< HEAD
+    playNim(20);
+    //playNimNegamax(20);
+=======
+<<<<<<< Updated upstream
+    
+    playNimNegamax(3);
+=======
+    //playNim(3);
+    playNimNegamax(3);
+
+>>>>>>> Stashed changes
+>>>>>>> origin/master
+=======
+    playNim(20);
+    //playNimNegamax(20);
+
+>>>>>>> Stashed changes
+>>>>>>> origin/master
+>>>>>>> origin/master
     return 0;
 }
