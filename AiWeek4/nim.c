@@ -56,7 +56,12 @@ int minValue(int state) {
 
 int minimaxDecision(int state, int turn) {
 <<<<<<< HEAD
+<<<<<<< HEAD
     int move, bestmove=0, max, min;
+=======
+    int move, bestmove, max, min;
+    
+>>>>>>> origin/master
 =======
     int move, bestmove, max, min;
     
@@ -89,8 +94,11 @@ int minimaxDecision(int state, int turn) {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 int negamaxValue(int state, int turn) {
 =======
+=======
+>>>>>>> origin/master
 
 int negamaxValue(int state, int player) {
 >>>>>>> origin/master
@@ -101,7 +109,11 @@ int negamaxValue(int state, int player) {
         return -1;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> origin/master
 =======
 
 >>>>>>> origin/master
@@ -195,6 +207,9 @@ int main(int argc, char *argv[]) {
     //printf("Negamax: \n");
     //playNimNegamax(8);
     
+<<<<<<< HEAD
+>>>>>>> origin/master
+=======
 >>>>>>> origin/master
     return 0;
 }
