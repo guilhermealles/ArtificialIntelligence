@@ -212,8 +212,30 @@ int main(int argc, char *argv[]) {
      */
     
     //playNim(atoi(argv[1]));
+<<<<<<< HEAD
     
     playNim(20);
     //playNimNegamax(20);
+=======
+<<<<<<< Updated upstream
+<<<<<<< HEAD
+    playNim(20);
+    //playNimNegamax(20);
+=======
+<<<<<<< Updated upstream
+    
+    playNimNegamax(3);
+=======
+    //playNim(3);
+    playNimNegamax(3);
+
+>>>>>>> Stashed changes
+>>>>>>> origin/master
+=======
+    playNim(20);
+    //playNimNegamax(20);
+
+>>>>>>> Stashed changes
+>>>>>>> origin/master
     return 0;
 }
