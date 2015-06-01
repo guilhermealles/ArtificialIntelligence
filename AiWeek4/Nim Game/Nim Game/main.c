@@ -71,6 +71,27 @@ int minimaxDecision(int state, int turn) {
     return bestmove;
 }
 
+int negamax(int state)
+{
+    int best_move = - INF;
+    int move;
+    
+    if (state - move == 0) // Is terminal state
+    {
+        return best_move;
+    }
+    
+    for (move = 1; move <=3; move++)
+    {
+        if (state - move > 0)
+        {
+            int m =
+        }
+    }
+    
+    
+}
+
 void playNim(int state) {
     int turn = 0;
     while (state != 1) {
@@ -81,6 +102,7 @@ void playNim(int state) {
     }
     printf("1: %s looses\n", (turn==MAX_V ? "Max" : "Min"));
 }
+
 
 int main(int argc, char *argv[]) {
     /*
