@@ -43,7 +43,7 @@ int minValue(int state) {
 }
 
 int minimaxDecision(int state, int turn) {
-    int move, bestmove = 0, max, min;
+    int move, bestmove, max, min;
     if (turn == MAX_V) {
         max = -INF;
         for (move = 1; move <= 3; move++) {
@@ -193,12 +193,7 @@ void playNimNegamax(int state)
     int turn = 0;
     while (state != 1)
     {
-<<<<<<< Updated upstream
         int action = negamaxDecision(state);
-=======
-        int result[2];
-        result = negamax(state);
->>>>>>> Stashed changes
         printf("%d: %s takes %d\n", state, (turn==MAX_V ? "Max" : "Min"), action);
         state = state - action;
         turn = 1 - turn;
@@ -217,18 +212,8 @@ int main(int argc, char *argv[]) {
      */
     
     //playNim(atoi(argv[1]));
-<<<<<<< HEAD
+    
     playNim(20);
     //playNimNegamax(20);
-=======
-<<<<<<< Updated upstream
-    
-    playNimNegamax(3);
-=======
-    //playNim(3);
-    playNimNegamax(3);
-
->>>>>>> Stashed changes
->>>>>>> origin/master
     return 0;
 }
