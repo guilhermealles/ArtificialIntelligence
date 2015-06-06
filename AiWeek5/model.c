@@ -37,6 +37,8 @@ int inferred;
 int cntidents = 0;
 char identifiers[MAXIDENTIFIERS][MAXIDENTNAMELENGTH+1];
 
+int *binaryArray;
+
 Expression makeConstantExpression(int value) {
     Expression e = malloc(sizeof(struct Expression));
     e->operator = CONSTANT;
@@ -374,35 +376,41 @@ void evaluateRandomModel(int modelSize) {
 
 /*** You should not need to change any code above this line ****/
 
+void intToBinaryArray(int number) {
+    char buffer[MAXIDENTIFIERS];
+    itoa(number, buffer, 2);
+    
+    // Copy the binary number to integer array
+    int i;
+    for (i=0; i<cntidents; i++) {
+        binaryArray[i] = buffer[i];
+    }
+}
+
+void setModelToBinaryArray() {
+    int i;
+    for (i=0; i<cntidents; i++) {
+        model[i] = binaryArray[i];
+    }
+}
+
 int checkAllModels(int modelSize) {
     /* return 1 if KB entails INFER, otherwise 0 */
     inferred = 1;
     
-    int possibilities = pow(2, modelSize);
-    int aux_model[MAXIDENTIFIERS];
-    int model_count = modelSize;
     int i;
-    
-    // Copy model array to aux_model array
-    for (i = 0; i < modelSize; i++)
-    {
-        aux_model[i] = model[i];
-    }
-    
-    for (i = 0; i < modelSize; i++)
-    {
-        while (model_count != 0)
-        {
-            model[i] = 
+    for (i=0; i<pow(2,modelSize)-1; i++) {
+        intToBinaryArray(i);
+        setModelToBinaryArray();
+        if (evaluateExpressionSet(kbSize, kb) && !evaluateExpressionSet(inferSize, infer)) {
+            printf("Counter example found: ");
+            showModel(modelSize);
+            
+            inferred = 0;
+            return inferred;
         }
     }
     
-    
-    /*
-     printf("THE FUNCTION checkAllModels IS NOT IMPLEMENTED YET\n");
-     printf("PLEASE IMPLEMENT IT YOURSELF!\n");
-     printf("THIS FUNCTION CURRENTLY ALWAYS RETURNS 1.\n\n");
-     */
     return inferred;
 }
 
@@ -416,6 +424,8 @@ int main(int argc, char *argv[]) {
     printf("\n");
     
     evaluateRandomModel(cntidents);
+    
+    binaryArray = malloc(sizeof(int) * cntidents);
     
     printf("\n");
     if (checkAllModels(cntidents)) {
