@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include <ctype.h>
 
 #define MAXKBSIZE          1024
@@ -377,20 +378,16 @@ void evaluateRandomModel(int modelSize) {
 /*** You should not need to change any code above this line ****/
 
 void intToBinaryArray(int number) {
-    char buffer[MAXIDENTIFIERS];
-    itoa(number, buffer, 2);
-    
-    // Copy the binary number to integer array
     int i;
     for (i=0; i<cntidents; i++) {
-        binaryArray[i] = buffer[i];
+        model[i] = 0;
     }
-}
-
-void setModelToBinaryArray() {
-    int i;
-    for (i=0; i<cntidents; i++) {
-        model[i] = binaryArray[i];
+    
+    i=0;
+    int quotient = number;
+    while (quotient != 0) {
+        model[i++] = quotient%2;
+        quotient /= 2;
     }
 }
 
@@ -398,10 +395,11 @@ int checkAllModels(int modelSize) {
     /* return 1 if KB entails INFER, otherwise 0 */
     inferred = 1;
     
+    binaryArray = malloc(sizeof(int) * modelSize);
+    
     int i;
-    for (i=0; i<pow(2,modelSize)-1; i++) {
+    for (i=0; i<pow(2,modelSize); i++) {
         intToBinaryArray(i);
-        setModelToBinaryArray();
         if (evaluateExpressionSet(kbSize, kb) && !evaluateExpressionSet(inferSize, infer)) {
             printf("Counter example found: ");
             showModel(modelSize);
@@ -411,6 +409,7 @@ int checkAllModels(int modelSize) {
         }
     }
     
+    free(binaryArray);
     return inferred;
 }
 
