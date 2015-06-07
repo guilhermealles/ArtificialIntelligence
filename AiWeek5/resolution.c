@@ -24,6 +24,8 @@ typedef struct clauseSet {
     clause *clauses;
 } clauseSet;
 
+clauseSet original_kb;
+
 /******** ADT for clauses ***************************************/
 
 int isEmptyClause(clause c) {
@@ -237,7 +239,23 @@ void printlnClauseSet(clauseSet s) {
     putchar('\n');
 }
 
-/******** Main program ***************************************/
+/******** Main program **************************************/
+
+// Returns TRUE if and only if both clauseSets are identical.
+int areEqualClauseSets(clauseSet a, clauseSet b) {
+    if (a.size != b.size) {
+        return FALSE;
+    }
+    else {
+        int i;
+        for (i=0; i<a.size; i++) {
+            if (areEqualClauses(a.clauses[i], b.clauses[i]) == FALSE) {
+                return FALSE;
+            }
+        }
+    }
+    return TRUE;
+}
 
 void resolveClauses(clause a, clause b, clauseSet *rsv) {
     /* returns the resolvents of the clauses a and b in the set rsv */
@@ -294,7 +312,47 @@ void init(clauseSet *s) {
 }
 
 void recursivePrintProof(int idx, clauseSet s) {
-    printf("IMPLEMENT THE ROUTINE recursivePrintProof yourself!\n");
+    int i,j;
+    for (i=0; i<s.size; i++) {
+        for (j=i+1; j < s.size; j++) {
+            clauseSet resolvent;
+            resolveClauses(s.clauses[i], s.clauses[j], &resolvent);
+            if (isElementOfClauseSet(s.clauses[idx], resolvent)) {
+                // If both clauses are in the original knowledge base, we're done.
+                if (isElementOfClauseSet(s.clauses[i], original_kb) && isElementOfClauseSet(s.clauses[j], original_kb)) {
+                    printClause(s.clauses[idx]);
+                    printf(" is inferred from ");
+                    printClause(s.clauses[i]);
+                    printf(" and ");
+                    printClause(s.clauses[j]);
+                    printf(".\n");
+                    return;
+                }
+                else {
+                    if (isElementOfClauseSet(s.clauses[j], original_kb) == FALSE) {
+                        recursivePrintProof(findIndexOfClause(s.clauses[j], s), s);
+                        printClause(s.clauses[idx]);
+                        printf(" is inferred from ");
+                        printClause(s.clauses[i]);
+                        printf(" and ");
+                        printClause(s.clauses[j]);
+                        printf(".\n");
+                    }
+                    
+                    if (isElementOfClauseSet(s.clauses[i], original_kb) == FALSE) {
+                        recursivePrintProof(findIndexOfClause(s.clauses[i], s), s);
+                        printClause(s.clauses[idx]);
+                        printf(" is inferred from ");
+                        printClause(s.clauses[i]);
+                        printf(" and ");
+                        printClause(s.clauses[j]);
+                        printf(".\n");
+                    }
+                    return;
+                }
+            }
+        }
+    }
 }
 
 void printProof(clauseSet s) {
@@ -308,6 +366,7 @@ void printProof(clauseSet s) {
 int main(int argc, char *argv[]) {
     clauseSet kb;
     init(&kb);
+    init(&original_kb);
     printf("KB=");
     printlnClauseSet(kb);
     resolution(&kb);
