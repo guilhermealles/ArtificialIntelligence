@@ -311,6 +311,14 @@ void init(clauseSet *s) {
     insertInClauseSet(c, s);
 }
 
+void initCustomKb(clauseSet *s, char *customKb) {
+    char clause[51];
+    int i=0;
+    while (customKb[i] != "\0") {
+        
+    }
+}
+
 void recursivePrintProof(int idx, clauseSet s) {
     int i,j;
     for (i=0; i<s.size; i++) {
@@ -365,13 +373,22 @@ void printProof(clauseSet s) {
 
 int main(int argc, char *argv[]) {
     clauseSet kb;
-    init(&kb);
-    init(&original_kb);
+    
+    if (argc == 1) {
+        init(&kb);
+        init(&original_kb);
+    }
+    else if (argc == 2) {
+        // ...
+    }
+    
     printf("KB=");
     printlnClauseSet(kb);
+    
     resolution(&kb);
     printf("KB after resolution=");
     printlnClauseSet(kb);
+    
     if (containsEmptyClause(kb)) {
         printf("Resolution proof completed.\n");
         printf("\nProof:\n");
@@ -379,6 +396,7 @@ int main(int argc, char *argv[]) {
     } else {
         printf("Resolution proof failed.\n");
     }
+    
     freeClauseSet(kb);
     return EXIT_SUCCESS;
 }
