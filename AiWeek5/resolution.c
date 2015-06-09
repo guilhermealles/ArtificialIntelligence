@@ -389,9 +389,7 @@ void printProof(clauseSet s) {
 
 int main(int argc, char *argv[]) {
     clauseSet kb;
-    
-    printf("%d\n\n", argc);
-    
+        
     if (argc == 1) {
         init(&kb);
         init(&original_kb);
