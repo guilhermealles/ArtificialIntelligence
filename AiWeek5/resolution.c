@@ -313,9 +313,25 @@ void init(clauseSet *s) {
 
 void initCustomKb(clauseSet *s, char *customKb) {
     char clause[51];
-    int i=0;
-    while (customKb[i] != "\0") {
-        
+    
+    struct clause c;
+    makeEmptyClauseSet(s);
+    
+    int i=4;
+    while (customKb[i] != *"\0") {
+        if (customKb[i] == *"[") {
+            int j=i+1, k=0;
+            while (customKb[j] != *"]") {
+                clause[k] = customKb[j];
+                k++;
+                j++;
+                i++;
+            }
+            clause[k] = *"\0";
+            makeClause(&c, clause);
+            insertInClauseSet(c, s);
+        }
+        i++;
     }
 }
 
@@ -374,12 +390,15 @@ void printProof(clauseSet s) {
 int main(int argc, char *argv[]) {
     clauseSet kb;
     
+    printf("%d\n\n", argc);
+    
     if (argc == 1) {
         init(&kb);
         init(&original_kb);
     }
     else if (argc == 2) {
-        // ...
+        initCustomKb(&kb, argv[1]);
+        initCustomKb(&original_kb, argv[1]);
     }
     
     printf("KB=");
@@ -398,5 +417,6 @@ int main(int argc, char *argv[]) {
     }
     
     freeClauseSet(kb);
+    freeClauseSet(original_kb);
     return EXIT_SUCCESS;
 }
